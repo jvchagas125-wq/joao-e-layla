@@ -1,12 +1,11 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-
 <head>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>João ❤️ Layla</title>
+<title>João e Layla ❤️</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -16,48 +15,17 @@
 
 body{
 font-family:Poppins;
-background:linear-gradient(135deg,#1a0a0a,#2d1515,#1a0a0a);
+background:linear-gradient(135deg,#1a0a0a,#2d1515);
 color:white;
 overflow-x:hidden;
 }
 
 .title{
 font-family:"Dancing Script";
-font-size:65px;
+font-size:60px;
 text-align:center;
 margin-top:40px;
 color:#ff9ac9;
-animation:float 4s ease-in-out infinite;
-}
-
-.quote{
-text-align:center;
-max-width:700px;
-margin:auto;
-font-size:18px;
-margin-top:20px;
-color:#ffd9ec;
-}
-
-.section{
-max-width:1000px;
-margin:auto;
-padding:20px;
-}
-
-.timer{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:10px;
-text-align:center;
-margin-top:40px;
-}
-
-.timer div{
-background:rgba(255,255,255,0.05);
-padding:20px;
-border-radius:15px;
-font-size:32px;
 }
 
 .gallery{
@@ -81,73 +49,25 @@ transition:0.4s;
 transform:scale(1.05);
 }
 
+.section{
+max-width:900px;
+margin:auto;
+padding:20px;
+}
+
+.timer{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+text-align:center;
+font-size:30px;
+margin-top:30px;
+}
+
 .music{
 margin-top:40px;
 border-radius:20px;
 overflow:hidden;
-}
-
-footer{
-text-align:center;
-margin-top:50px;
-font-size:22px;
-color:#ffb6d9;
-font-family:"Dancing Script";
-}
-
-@keyframes float{
-
-0%,100%{transform:translateY(0)}
-50%{transform:translateY(-10px)}
-
-}
-
-.heart{
-position:fixed;
-top:-10px;
-font-size:20px;
-animation:fall 8s linear infinite;
-opacity:0.7;
-}
-
-@keyframes fall{
-
-0%{
-transform:translateY(-10px) rotate(0);
-}
-
-100%{
-transform:translateY(110vh) rotate(360deg);
-}
-
-}
-
-.popup{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.8);
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:10;
-}
-
-.popup-box{
-background:#2d1515;
-padding:30px;
-border-radius:20px;
-text-align:center;
-max-width:300px;
-}
-
-button{
-background:#ff6fae;
-padding:10px 20px;
-border-radius:10px;
-margin-top:15px;
 }
 
 </style>
@@ -156,44 +76,14 @@ margin-top:15px;
 
 <body>
 
-<!-- popup -->
-
-<div class="popup" id="popup">
-
-<div class="popup-box">
-
-<h2 style="font-family:Dancing Script;font-size:35px">
-Para Layla ❤️
-</h2>
-
-<p>
-Esse site é só uma pequena forma de mostrar o quanto você é especial para mim.
-</p>
-
-<button onclick="startSite()">
-Abrir ❤️
-</button>
-
-</div>
-
-</div>
-
-<h1 class="title">
-João ❤️ Layla
-</h1>
-
-<p class="quote">
-
-"Chega um momento em que a palavra alegria muda de significado.
-A minha maior alegria hoje é ter você ao meu lado."
-
-</p>
+<h1 class="title">João e Layla ❤️</h1>
 
 <div class="section">
 
-<h2 style="text-align:center;font-size:30px">
-💕 Nosso tempo juntos
-</h2>
+<p style="text-align:center;font-size:18px">
+"Chega um momento em que a palavra alegria muda de significado.
+A minha maior alegria hoje é ter você ao meu lado."
+</p>
 
 <div class="timer">
 
@@ -223,8 +113,8 @@ A minha maior alegria hoje é ter você ao meu lado."
 
 <div class="section">
 
-<h2 style="text-align:center;font-size:30px">
-📸 Nossas fotos
+<h2 style="text-align:center;font-size:30px;margin-bottom:10px">
+📸 Nossas Fotos
 </h2>
 
 <div class="gallery">
@@ -248,36 +138,18 @@ A minha maior alegria hoje é ter você ao meu lado."
 
 <div class="music">
 
-<iframe
-id="music"
+<iframe id="music"
 width="100%"
 height="400"
 src="https://drive.google.com/file/d/1NfUfUqbE1NYLCy2Qj0Hk-dykM-nnXU-1/preview"
 allow="autoplay">
-
 </iframe>
 
 </div>
 
 </div>
 
-<footer>
-
-❤️ Para sempre nós dois ❤️
-
-</footer>
-
 <script>
-
-function startSite(){
-
-document.getElementById("popup").style.display="none";
-
-const iframe = document.getElementById("music");
-
-iframe.src = iframe.src + "&autoplay=1";
-
-}
 
 const startDate = new Date("2024-03-28T22:00:00");
 
@@ -285,13 +157,20 @@ function updateClock(){
 
 const now = new Date();
 
+let diff = now - startDate;
+
+let seconds = Math.floor(diff/1000);
+let minutes = Math.floor(seconds/60);
+let hours = Math.floor(minutes/60);
+let days = Math.floor(hours/24);
+
 let years = now.getFullYear() - startDate.getFullYear();
 let months = now.getMonth() - startDate.getMonth();
-let days = now.getDate() - startDate.getDate();
+let remainingDays = now.getDate() - startDate.getDate();
 
-if(days < 0){
+if(remainingDays < 0){
 months--;
-days += 30;
+remainingDays += 30;
 }
 
 if(months < 0){
@@ -299,47 +178,28 @@ years--;
 months += 12;
 }
 
-let diff = now - startDate;
-let hours = Math.floor(diff / 1000 / 60 / 60);
-
 document.getElementById("years").innerText = years;
 document.getElementById("months").innerText = months;
-document.getElementById("days").innerText = days;
+document.getElementById("days").innerText = remainingDays;
 document.getElementById("hours").innerText = hours % 24;
 
 }
 
 setInterval(updateClock,1000);
-
 updateClock();
 
 
-// corações caindo
+// autoplay quando tocar na tela
 
-function createHeart(){
+document.body.addEventListener("click",function(){
 
-const heart=document.createElement("div");
+const iframe = document.getElementById("music");
 
-heart.className="heart";
+iframe.src = iframe.src + "&autoplay=1";
 
-heart.innerHTML="❤️";
-
-heart.style.left=Math.random()*100+"vw";
-
-heart.style.animationDuration=5+Math.random()*5+"s";
-
-document.body.appendChild(heart);
-
-setTimeout(()=>{
-heart.remove();
-},8000);
-
-}
-
-setInterval(createHeart,600);
+},{once:true});
 
 </script>
 
 </body>
-
 </html>
