@@ -1,306 +1,417 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>João ❤️ Layla</title>
-
-<script src="https://cdn.tailwindcss.com"></script>
-
-<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Poppins:wght@300;400&display=swap" rel="stylesheet">
-
-<style>
-
-body{
-font-family:Poppins;
-background:linear-gradient(135deg,#1a0a0a,#2d1515,#1a0a0a);
-color:white;
-overflow-x:hidden;
-}
-
-.title{
-font-family:"Dancing Script";
-font-size:65px;
-text-align:center;
-margin-top:40px;
-color:#ff9ac9;
-animation:float 4s ease-in-out infinite;
-}
-
-.quote{
-text-align:center;
-max-width:700px;
-margin:auto;
-font-size:18px;
-margin-top:20px;
-color:#ffd9ec;
-}
-
-.section{
-max-width:1000px;
-margin:auto;
-padding:20px;
-}
-
-.timer{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:10px;
-text-align:center;
-margin-top:40px;
-}
-
-.timer div{
-background:rgba(255,255,255,0.05);
-padding:20px;
-border-radius:15px;
-font-size:32px;
-}
-
-.gallery{
-display:flex;
-gap:15px;
-overflow-x:auto;
-padding:20px;
-scroll-snap-type:x mandatory;
-}
-
-.gallery img{
-width:260px;
-height:360px;
-object-fit:cover;
-border-radius:20px;
-scroll-snap-align:center;
-transition:0.4s;
-}
-
-.gallery img:hover{
-transform:scale(1.05);
-}
-
-.music{
-margin-top:40px;
-border-radius:20px;
-overflow:hidden;
-}
-
-footer{
-text-align:center;
-margin-top:50px;
-font-size:22px;
-color:#ffb6d9;
-font-family:"Dancing Script";
-}
-
-@keyframes float{
-
-0%,100%{transform:translateY(0)}
-50%{transform:translateY(-10px)}
-
-}
-
-.heart{
-position:fixed;
-top:-10px;
-font-size:20px;
-animation:fall 8s linear infinite;
-opacity:0.7;
-}
-
-@keyframes fall{
-
-0%{
-transform:translateY(-10px) rotate(0);
-}
-
-100%{
-transform:translateY(110vh) rotate(360deg);
-}
-
-}
-
-.popup{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.8);
-display:flex;
-justify-content:center;
-align-items:center;
-z-index:10;
-}
-
-.popup-box{
-background:#2d1515;
-padding:30px;
-border-radius:20px;
-text-align:center;
-max-width:300px;
-}
-
-button{
-background:#ff6fae;
-padding:10px 20px;
-border-radius:10px;
-margin-top:15px;
-}
-
-</style>
-
-</head>
-
-<body>
-
-<!-- popup -->
-
-<div class="popup" id="popup">
-
-<div class="popup-box">
-
-<h2 style="font-family:Dancing Script;font-size:35px">
-Para Layla ❤️
-</h2>
-
-<p>
-Esse site é só uma pequena forma de mostrar o quanto você é especial para mim.
-</p>
-
-<button onclick="startSite()">
-Abrir ❤️
-</button>
-
-</div>
-
-
-<h1 class="title">João e Layla ❤️</h1>
-
-<div class="section">
-
-<p style="text-align:center;font-size:18px">
-"Chega um momento em que a palavra alegria muda de significado.
-A minha maior alegria hoje é ter você ao meu lado."
-</p>
-
-<div class="timer">
-
-<div>
-<div id="years">0</div>
-<small>anos</small>
-</div>
-
-<div>
-<div id="months">0</div>
-<small>meses</small>
-</div>
-
-<div>
-<div id="days">0</div>
-<small>dias</small>
-</div>
-
-<div>
-<div id="hours">0</div>
-<small>horas</small>
-</div>
-
-</div>
-
-</div>
-
-<div class="section">
-
-<h2 style="text-align:center;font-size:30px;margin-bottom:10px">
-📸 Nossas Fotos
-</h2>
-
-<div class="gallery">
-
-<img src="https://i.imgur.com/TkYEkFj.jpg">
-<img src="https://i.imgur.com/2w7Giid.jpg">
-<img src="https://i.imgur.com/lWwLU82.jpg">
-<img src="https://i.imgur.com/dUbQ1ud.jpg">
-<img src="https://i.imgur.com/ngcsCnR.jpg">
-<img src="https://i.imgur.com/kpaR51v.jpg">
-
-</div>
-
-</div>
-
-<div class="section">
-
-<h2 style="text-align:center;font-size:30px">
-🎵 Nossa Música
-</h2>
-
-<div class="music">
-
-<iframe id="music"
-width="100%"
-height="400"
-src="https://drive.google.com/file/d/1NfUfUqbE1NYLCy2Qj0Hk-dykM-nnXU-1/preview"
-allow="autoplay">
-</iframe>
-
-</div>
-
-</div>
-
-<script>
-
-const startDate = new Date("2024-03-28T22:00:00");
-
-function updateClock(){
-
-const now = new Date();
-
-let diff = now - startDate;
-
-let seconds = Math.floor(diff/1000);
-let minutes = Math.floor(seconds/60);
-let hours = Math.floor(minutes/60);
-let days = Math.floor(hours/24);
-
-let years = now.getFullYear() - startDate.getFullYear();
-let months = now.getMonth() - startDate.getMonth();
-let remainingDays = now.getDate() - startDate.getDate();
-
-if(remainingDays < 0){
-months--;
-remainingDays += 30;
-}
-
-if(months < 0){
-years--;
-months += 12;
-}
-
-document.getElementById("years").innerText = years;
-document.getElementById("months").innerText = months;
-document.getElementById("days").innerText = remainingDays;
-document.getElementById("hours").innerText = hours % 24;
-
-}
-
-setInterval(updateClock,1000);
-updateClock();
-
-
-// autoplay quando tocar na tela
-
-document.body.addEventListener("click",function(){
-
-const iframe = document.getElementById("music");
-
-iframe.src = iframe.src + "&autoplay=1";
-
-},{once:true});
-
-</script>
-
-</body>
+<!doctype html>
+<html lang="pt-BR" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>João e Layla ❤️</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&amp;family=Playfair+Display:wght@400;500;600&amp;family=Poppins:wght@300;400;500&amp;display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .bg-romantic {
+      background: linear-gradient(135deg, #1a0a0a 0%, #2d1515 50%, #1a0a0a 100%);
+      min-height: 100%;
+    }
+    
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      25% { transform: scale(1.15); }
+      50% { transform: scale(1); }
+      75% { transform: scale(1.1); }
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0) rotate(-2deg); }
+      50% { transform: translateY(-15px) rotate(2deg); }
+    }
+    
+    @keyframes sparkle {
+      0%, 100% { opacity: 0; transform: scale(0) rotate(0deg); }
+      50% { opacity: 1; transform: scale(1) rotate(180deg); }
+    }
+    
+    @keyframes pulse-glow {
+      0%, 100% { box-shadow: 0 0 20px rgba(244, 114, 182, 0.3); }
+      50% { box-shadow: 0 0 40px rgba(244, 114, 182, 0.6), 0 0 60px rgba(244, 114, 182, 0.3); }
+    }
+    
+    @keyframes shimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+    
+    @keyframes floating-heart {
+      0% { transform: translateY(100%) scale(0); opacity: 0; }
+      10% { opacity: 1; }
+      90% { opacity: 1; }
+      100% { transform: translateY(-100%) scale(1); opacity: 0; }
+    }
+    
+    .heartbeat { animation: heartbeat 1.2s ease-in-out infinite; }
+    .float { animation: float 4s ease-in-out infinite; }
+    .pulse-glow { animation: pulse-glow 2s ease-in-out infinite; }
+    
+    .sparkle {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background: radial-gradient(circle, #fff 0%, #f472b6 50%, transparent 70%);
+      border-radius: 50%;
+      animation: sparkle 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+    
+    .glass {
+      background: rgba(255, 255, 255, 0.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .glass-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    
+    .title-gradient {
+      background: linear-gradient(90deg, #f472b6, #fb7185, #f472b6);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      animation: shimmer 3s linear infinite;
+    }
+    
+    .time-number {
+      background: linear-gradient(180deg, #fff 0%, #f8b4d9 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(244, 114, 182, 0.5);
+    }
+    
+    .photo-card {
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      flex-shrink: 0;
+    }
+    
+    .photo-card:hover {
+      transform: scale(1.05) rotate(2deg);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.4), 0 0 30px rgba(244, 114, 182, 0.3);
+    }
+    
+    .photo-placeholder {
+      background: linear-gradient(135deg, #3d1f1f 0%, #2d1515 50%, #1f0f0f 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: rgba(244, 114, 182, 0.4);
+      border: 2px dashed rgba(244, 114, 182, 0.3);
+    }
+    
+    .scroll-container {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(244, 114, 182, 0.5) rgba(255,255,255,0.1);
+    }
+    
+    .scroll-container::-webkit-scrollbar {
+      height: 8px;
+    }
+    
+    .scroll-container::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.1);
+      border-radius: 10px;
+    }
+    
+    .scroll-container::-webkit-scrollbar-thumb {
+      background: linear-gradient(90deg, #f472b6, #fb7185);
+      border-radius: 10px;
+    }
+    
+    .floating-hearts {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+    
+    .floating-heart {
+      position: absolute;
+      font-size: 1.5rem;
+      animation: floating-heart 8s ease-in-out infinite;
+      opacity: 0.6;
+    }
+  </style>
+  <script src="https://cdn.tailwindcss.com/3.4.17" type="text/javascript"></script>
+  <style>body { box-sizing: border-box; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <style>
+    @keyframes modal-entrance {
+      0% { opacity: 0; transform: scale(0.9); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    
+    .modal-entrance { animation: modal-entrance 0.6s ease-out; }
+  </style>
+ </head>
+ <body class="h-full text-pink-100"><!-- Welcome Modal -->
+  <div id="welcome-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+   <div class="modal-entrance glass-card rounded-3xl p-8 sm:p-12 max-w-md w-full text-center" style="background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(244, 114, 182, 0.3);">
+    <div class="text-5xl mb-6 animate-bounce">
+     💕
+    </div>
+    <h2 class="text-2xl sm:text-3xl font-bold mb-6" style="font-family: 'Dancing Script', cursive; color: #f9a8d4;">Uma Mensagem Especial</h2>
+    <p id="welcome-message" class="text-lg leading-relaxed mb-8" style="color: #fce7f3; font-family: 'Playfair Display', serif;">Esse site é só uma pequena forma de mostrar o quanto você é o amor da minha vida.</p><button id="open-btn" class="px-8 py-3 rounded-full font-semibold text-lg transition-all hover:scale-105 active:scale-95" style="background: linear-gradient(90deg, #f472b6, #fb7185); color: white; box-shadow: 0 0 30px rgba(244, 114, 182, 0.4);"> Abrir </button>
+   </div>
+  </div>
+  <div class="bg-romantic w-full h-full overflow-auto"><!-- Floating Hearts Background -->
+   <div class="floating-hearts" aria-hidden="true">
+    <div class="floating-heart" style="left: 5%; animation-delay: 0s;">
+     💕
+    </div>
+    <div class="floating-heart" style="left: 15%; animation-delay: 1.5s;">
+     ❤️
+    </div>
+    <div class="floating-heart" style="left: 25%; animation-delay: 3s;">
+     💗
+    </div>
+    <div class="floating-heart" style="left: 35%; animation-delay: 0.5s;">
+     💖
+    </div>
+    <div class="floating-heart" style="left: 45%; animation-delay: 2s;">
+     💕
+    </div>
+    <div class="floating-heart" style="left: 55%; animation-delay: 4s;">
+     ❤️
+    </div>
+    <div class="floating-heart" style="left: 65%; animation-delay: 1s;">
+     💗
+    </div>
+    <div class="floating-heart" style="left: 75%; animation-delay: 2.5s;">
+     💖
+    </div>
+    <div class="floating-heart" style="left: 85%; animation-delay: 3.5s;">
+     💕
+    </div>
+    <div class="floating-heart" style="left: 95%; animation-delay: 0.8s;">
+     ❤️
+    </div>
+   </div><!-- Sparkles -->
+   <div class="fixed inset-0 pointer-events-none z-0" aria-hidden="true">
+    <div class="sparkle" style="top: 8%; left: 12%; animation-delay: 0s;"></div>
+    <div class="sparkle" style="top: 15%; left: 85%; animation-delay: 0.5s;"></div>
+    <div class="sparkle" style="top: 25%; left: 5%; animation-delay: 1s;"></div>
+    <div class="sparkle" style="top: 35%; left: 92%; animation-delay: 1.5s;"></div>
+    <div class="sparkle" style="top: 45%; left: 8%; animation-delay: 2s;"></div>
+    <div class="sparkle" style="top: 55%; left: 88%; animation-delay: 0.3s;"></div>
+    <div class="sparkle" style="top: 65%; left: 15%; animation-delay: 0.8s;"></div>
+    <div class="sparkle" style="top: 75%; left: 78%; animation-delay: 1.2s;"></div>
+    <div class="sparkle" style="top: 85%; left: 22%; animation-delay: 1.8s;"></div>
+    <div class="sparkle" style="top: 92%; left: 65%; animation-delay: 2.2s;"></div>
+   </div>
+   <div class="relative z-10 max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8"><!-- Header -->
+    <header class="text-center mb-12">
+     <h1 id="main-title" class="text-4xl sm:text-5xl md:text-6xl title-gradient float font-bold mb-6" style="font-family: 'Dancing Script', cursive;">João e Layla ❤️</h1>
+     <div class="glass-card rounded-2xl p-6 max-w-2xl mx-auto">
+      <p id="love-quote" class="text-lg sm:text-xl italic leading-relaxed" style="font-family: 'Playfair Display', serif; color: #fce7f3;">Chega um momento em que a palavra alegria muda de significado. A minha maior alegria hoje é ter você ao meu lado. ❤️💍</p>
+     </div>
+    </header><!-- Love Clock -->
+    <section class="glass rounded-3xl p-6 sm:p-8 mb-12 pulse-glow" aria-label="Contador de tempo juntos">
+     <h2 class="text-3xl sm:text-4xl text-center mb-8" style="font-family: 'Dancing Script', cursive; color: #f9a8d4;">💕 Nosso Tempo Juntos 💕</h2>
+     <div class="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-6">
+      <div class="glass-card rounded-2xl p-4 sm:p-6 text-center transform hover:scale-105 transition-transform">
+       <div id="years" class="text-4xl sm:text-5xl font-bold time-number">
+        0
+       </div>
+       <p class="text-pink-300 mt-2 text-sm sm:text-base">Anos</p>
+      </div>
+      <div class="glass-card rounded-2xl p-4 sm:p-6 text-center transform hover:scale-105 transition-transform">
+       <div id="months" class="text-4xl sm:text-5xl font-bold time-number">
+        0
+       </div>
+       <p class="text-pink-300 mt-2 text-sm sm:text-base">Meses</p>
+      </div>
+      <div class="glass-card rounded-2xl p-4 sm:p-6 text-center transform hover:scale-105 transition-transform">
+       <div id="days" class="text-4xl sm:text-5xl font-bold time-number">
+        0
+       </div>
+       <p class="text-pink-300 mt-2 text-sm sm:text-base">Dias</p>
+      </div>
+      <div class="glass-card rounded-2xl p-4 sm:p-6 text-center transform hover:scale-105 transition-transform">
+       <div id="hours" class="text-4xl sm:text-5xl font-bold time-number">
+        0
+       </div>
+       <p class="text-pink-300 mt-2 text-sm sm:text-base">Horas</p>
+      </div>
+     </div>
+     <div class="text-center">
+      <div class="inline-flex items-center gap-4 text-pink-200"><span><span id="minutes" class="font-semibold text-lg">0</span> minutos</span> <span class="text-pink-400">•</span> <span><span id="seconds" class="font-semibold text-lg">0</span> segundos</span>
+      </div>
+      <p class="mt-4 text-xs text-pink-400/70">✨ Desde 28 de Março de 2024 às 22:00 ✨</p>
+     </div>
+    </section><!-- Photo Gallery -->
+    <section class="mb-12" aria-label="Galeria de fotos">
+     <div class="relative">
+      <div id="photo-gallery" class="scroll-container flex gap-4 overflow-x-auto pb-2 px-2"><img src="https://imgur.com/TkYEkFj.jpg" alt="João e Layla" class="photo-card w-56 sm:w-64 md:w-72 h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/2w7Giid.jpg" alt="João e Layla" class="photo-card w-56 sm:w-64 md:w-72 h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/lWwLU82.jpg" alt="João e Layla" class="photo-card w-56 sm:w-64 md:w-72 h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/dUbQ1ud.jpg" alt="João e Layla" class="photo-card w-56 sm:w-64 md:w-72 h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/ngcsCnR.jpg" alt="João e Layla" class="photo-card w-56 sm:w-64 md:w-72 h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/kpaR51v.jpg" alt="João e Layla" class="photo-card w-56 sm:w-64 md:w-72 h-64 sm:h-80 md:h-96 rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';">
+      </div>
+      <p class="text-center text-pink-400/60 text-sm mt-6">Deslize para ver mais fotos 💕</p>
+     </div>
+    </section><!-- Our Song -->
+    <section class="glass rounded-3xl p-6 sm:p-8 mb-12" aria-label="Nossa música">
+     <h2 class="text-3xl sm:text-4xl text-center mb-6" style="font-family: 'Dancing Script', cursive; color: #f9a8d4;">🎵 Nossa Música</h2>
+     <div class="relative w-full rounded-2xl overflow-hidden shadow-2xl" style="padding-bottom: 56.25%;"><iframe class="absolute top-0 left-0 w-full h-full" src="https://drive.google.com/file/d/1NfUfUqbE1NYLCy2Qj0Hk-dykM-nnXU-1/preview" allow="autoplay" allowfullscreen title="Nossa música especial"></iframe>
+     </div>
+    </section><!-- Footer -->
+    <footer class="text-center py-8">
+     <div class="inline-flex items-center gap-3 text-xl sm:text-2xl" style="font-family: 'Dancing Script', cursive;"><span class="heartbeat text-2xl">❤️</span> <span id="footer-text" class="text-pink-300">Para sempre juntos</span> <span class="heartbeat text-2xl" style="animation-delay: 0.3s;">❤️</span>
+     </div>
+     <p class="mt-4 text-pink-400/50 text-sm">Feito com muito amor 💕</p>
+    </footer>
+   </div>
+  </div>
+  <script>
+    const defaultConfig = {
+      couple_names: "João e Layla ❤️",
+      love_quote: "Chega um momento em que a palavra alegria muda de significado. ❤️ A minha maior alegria hoje é ter você ao meu lado. 💍",
+      footer_text: "Para sempre juntos",
+      background_color: "#1a0a0a",
+      accent_color: "#f472b6",
+      text_color: "#fce7f3",
+      card_color: "rgba(255,255,255,0.06)",
+      highlight_color: "#fb7185"
+    };
+
+    // Love Clock
+    const startDate = new Date("2024-03-28T22:00:00");
+
+    function updateClock() {
+      const now = new Date();
+      const diff = now - startDate;
+      
+      if (diff < 0) return;
+      
+      const seconds = Math.floor(diff / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      
+      let years = now.getFullYear() - startDate.getFullYear();
+      let months = now.getMonth() - startDate.getMonth();
+      let remainingDays = now.getDate() - startDate.getDate();
+      
+      if (remainingDays < 0) {
+        months--;
+        const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+        remainingDays += prevMonth.getDate();
+      }
+      
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+      
+      document.getElementById('years').textContent = years;
+      document.getElementById('months').textContent = months;
+      document.getElementById('days').textContent = remainingDays;
+      document.getElementById('hours').textContent = hours % 24;
+      document.getElementById('minutes').textContent = minutes % 60;
+      document.getElementById('seconds').textContent = seconds % 60;
+    }
+
+    updateClock();
+    setInterval(updateClock, 1000);
+
+    // Element SDK
+    async function onConfigChange(config) {
+      const title = document.getElementById('main-title');
+      const quote = document.getElementById('love-quote');
+      const footer = document.getElementById('footer-text');
+      
+      if (title) title.textContent = config.couple_names || defaultConfig.couple_names;
+      if (quote) quote.textContent = `"${config.love_quote || defaultConfig.love_quote}"`;
+      if (footer) footer.textContent = config.footer_text || defaultConfig.footer_text;
+    }
+
+    function mapToCapabilities(config) {
+      return {
+        recolorables: [
+          {
+            get: () => config.accent_color || defaultConfig.accent_color,
+            set: (value) => {
+              config.accent_color = value;
+              window.elementSdk.setConfig({ accent_color: value });
+            }
+          },
+          {
+            get: () => config.text_color || defaultConfig.text_color,
+            set: (value) => {
+              config.text_color = value;
+              window.elementSdk.setConfig({ text_color: value });
+            }
+          },
+          {
+            get: () => config.highlight_color || defaultConfig.highlight_color,
+            set: (value) => {
+              config.highlight_color = value;
+              window.elementSdk.setConfig({ highlight_color: value });
+            }
+          }
+        ],
+        borderables: [],
+        fontEditable: {
+          get: () => config.font_family || 'Dancing Script',
+          set: (value) => {
+            config.font_family = value;
+            window.elementSdk.setConfig({ font_family: value });
+          }
+        },
+        fontSizeable: undefined
+      };
+    }
+
+    function mapToEditPanelValues(config) {
+      return new Map([
+        ["couple_names", config.couple_names || defaultConfig.couple_names],
+        ["love_quote", config.love_quote || defaultConfig.love_quote],
+        ["footer_text", config.footer_text || defaultConfig.footer_text]
+      ]);
+    }
+
+    if (window.elementSdk) {
+      window.elementSdk.init({
+        defaultConfig,
+        onConfigChange,
+        mapToCapabilities,
+        mapToEditPanelValues
+      });
+    }
+
+    // Welcome Modal Handler
+    const welcomeModal = document.getElementById('welcome-modal');
+    const openBtn = document.getElementById('open-btn');
+    const welcomeMessage = document.getElementById('welcome-message');
+
+    openBtn.addEventListener('click', () => {
+      welcomeModal.style.opacity = '0';
+      welcomeModal.style.pointerEvents = 'none';
+      welcomeModal.style.transition = 'opacity 0.4s ease-out';
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d9bae7de0e40d47',t:'MTc3MzA3NjEwNi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
