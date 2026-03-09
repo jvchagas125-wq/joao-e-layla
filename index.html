@@ -110,7 +110,7 @@
     @media (max-width: 768px) {
       .photo-card {
         width: 100% !important;
-        height: 1920px !important;
+        height: 400px !important;
         min-width: 100%;
       }
     }
@@ -179,8 +179,7 @@
     .modal-entrance { animation: modal-entrance 0.6s ease-out; }
   </style>
  </head>
- <body class="h-full text-pink-100">
-  <!-- Welcome Modal -->
+ <body class="h-full text-pink-100"><!-- Welcome Modal -->
   <div id="welcome-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
    <div class="modal-entrance glass-card rounded-3xl p-8 sm:p-12 max-w-md w-full text-center" style="background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.05) 100%); border: 2px solid rgba(244, 114, 182, 0.3);">
     <div class="text-5xl mb-6 animate-bounce">
@@ -190,8 +189,7 @@
     <p id="welcome-message" class="text-lg leading-relaxed mb-8" style="color: #fce7f3; font-family: 'Playfair Display', serif;">Esse site é só uma pequena forma de mostrar o quanto você é o amor da minha vida.</p><button id="open-btn" class="px-8 py-3 rounded-full font-semibold text-lg transition-all hover:scale-105 active:scale-95" style="background: linear-gradient(90deg, #f472b6, #fb7185); color: white; box-shadow: 0 0 30px rgba(244, 114, 182, 0.4);"> Abrir </button>
    </div>
   </div>
-  <div class="bg-romantic w-full h-full overflow-auto">
-   <!-- Floating Hearts Background -->
+  <div class="bg-romantic w-full h-full overflow-auto"><!-- Floating Hearts Background -->
    <div class="floating-hearts" aria-hidden="true">
     <div class="floating-heart" style="left: 5%; animation-delay: 0s;">
      💕
@@ -236,8 +234,7 @@
     <div class="sparkle" style="top: 85%; left: 22%; animation-delay: 1.8s;"></div>
     <div class="sparkle" style="top: 92%; left: 65%; animation-delay: 2.2s;"></div>
    </div>
-   <div class="relative z-10 max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-    <!-- Header -->
+   <div class="relative z-10 max-w-4xl mx-auto px-4 py-8 sm:px-6 lg:px-8"><!-- Header -->
     <header class="text-center mb-12">
      <h1 id="main-title" class="text-4xl sm:text-5xl md:text-6xl title-gradient float font-bold mb-6" style="font-family: 'Dancing Script', cursive;">João e Layla ❤️</h1>
      <div class="glass-card rounded-2xl p-6 max-w-2xl mx-auto">
@@ -273,29 +270,25 @@
       </div>
      </div>
      <div class="text-center">
-      <div class="inline-flex items-center gap-4 text-pink-200">
-       <span><span id="minutes" class="font-semibold text-lg">0</span> minutos</span> <span class="text-pink-400">•</span> <span><span id="seconds" class="font-semibold text-lg">0</span> segundos</span>
+      <div class="inline-flex items-center gap-4 text-pink-200"><span><span id="minutes" class="font-semibold text-lg">0</span> minutos</span> <span class="text-pink-400">•</span> <span><span id="seconds" class="font-semibold text-lg">0</span> segundos</span>
       </div>
       <p class="mt-4 text-xs text-pink-400/70">✨ Desde 28 de Março de 2024 às 22:00 ✨</p>
      </div>
     </section><!-- Photo Gallery -->
     <section class="mb-12" aria-label="Galeria de fotos">
      <div class="relative">
-      <div id="photo-gallery" class="scroll-container flex gap-4 overflow-x-auto pb-2 px-2">
-       <img src="https://imgur.com/TkYEkFj.jpg" alt="João e Layla" class="photo-card w-72 sm:w-80 md:w-96 h-80 sm:h-96 md:h-full rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/2w7Giid.jpg" alt="João e Layla" class="photo-card w-72 sm:w-80 md:w-96 h-80 sm:h-96 md:h-full rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/lWwLU82.jpg" alt="João e Layla" class="photo-card w-72 sm:w-80 md:w-96 h-80 sm:h-96 md:h-full rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/dUbQ1ud.jpg" alt="João e Layla" class="photo-card w-72 sm:w-80 md:w-96 h-80 sm:h-96 md:h-full rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/ngcsCnR.jpg" alt="João e Layla" class="photo-card w-72 sm:w-80 md:w-96 h-80 sm:h-96 md:h-full rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/kpaR51v.jpg" alt="João e Layla" class="photo-card w-72 sm:w-80 md:w-96 h-80 sm:h-96 md:h-full rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';">
+      <div id="photo-gallery" class="scroll-container flex gap-4 overflow-x-auto pb-2 px-2"><img src="https://imgur.com/TkYEkFj.jpg" alt="João e Layla" class="photo-card w-72 sm:w-80 md:w-96 h-80 sm:h-96 md:h-full rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/2w7Giid.jpg" alt="João e Layla" class="photo-card w-72 sm:w-80 md:w-96 h-80 sm:h-96 md:h-full rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/lWwLU82.jpg" alt="João e Layla" class="photo-card w-72 sm:w-80 md:w-96 h-80 sm:h-96 md:h-full rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/dUbQ1ud.jpg" alt="João e Layla" class="photo-card w-72 sm:w-80 md:w-96 h-80 sm:h-96 md:h-full rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/ngcsCnR.jpg" alt="João e Layla" class="photo-card w-72 sm:w-80 md:w-96 h-80 sm:h-96 md:h-full rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';"> <img src="https://imgur.com/kpaR51v.jpg" alt="João e Layla" class="photo-card w-72 sm:w-80 md:w-96 h-80 sm:h-96 md:h-full rounded-2xl overflow-hidden shadow-xl object-cover" loading="lazy" onerror="console.error('Image failed to load:', this.src); this.style.background='#3d1f1f'; this.alt='Foto não disponível';">
       </div>
       <p class="text-center text-pink-400/60 text-sm mt-6">Deslize para ver mais fotos 💕</p>
      </div>
     </section><!-- Our Song -->
     <section class="glass rounded-3xl p-6 sm:p-8 mb-12" aria-label="Nossa música">
      <h2 class="text-3xl sm:text-4xl text-center mb-6" style="font-family: 'Dancing Script', cursive; color: #f9a8d4;">🎵 Nossa Música</h2>
-     <div class="relative w-full rounded-2xl overflow-hidden shadow-2xl" style="padding-bottom: 56.25%;">
-      <iframe class="absolute top-0 left-0 w-full h-full" src="https://drive.google.com/file/d/1NfUfUqbE1NYLCy2Qj0Hk-dykM-nnXU-1/preview" allow="autoplay" allowfullscreen title="Nossa música especial"></iframe>
+     <div class="relative w-full rounded-2xl overflow-hidden shadow-2xl" style="padding-bottom: 56.25%;"><iframe class="absolute top-0 left-0 w-full h-full" src="https://drive.google.com/file/d/1NfUfUqbE1NYLCy2Qj0Hk-dykM-nnXU-1/preview" allow="autoplay" allowfullscreen title="Nossa música especial"></iframe>
      </div>
     </section><!-- Footer -->
     <footer class="text-center py-8">
-     <div class="inline-flex items-center gap-3 text-xl sm:text-2xl" style="font-family: 'Dancing Script', cursive;">
-      <span class="heartbeat text-2xl">❤️</span> <span id="footer-text" class="text-pink-300">Para sempre juntos</span> <span class="heartbeat text-2xl" style="animation-delay: 0.3s;">❤️</span>
+     <div class="inline-flex items-center gap-3 text-xl sm:text-2xl" style="font-family: 'Dancing Script', cursive;"><span class="heartbeat text-2xl">❤️</span> <span id="footer-text" class="text-pink-300">Para sempre juntos</span> <span class="heartbeat text-2xl" style="animation-delay: 0.3s;">❤️</span>
      </div>
      <p class="mt-4 text-pink-400/50 text-sm">Feito com muito amor 💕</p>
     </footer>
@@ -429,5 +422,5 @@
       welcomeModal.style.transition = 'opacity 0.4s ease-out';
     });
   </script>
- <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d9d99afc350df56',t:'MTc3MzA5NjIyNS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9d9dd723b2b5df56',t:'MTc3MzA5ODc0Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
