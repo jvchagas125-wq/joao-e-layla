@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>João e Layla ❤️</title>
+<title>João ❤️ Layla</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
@@ -15,17 +16,48 @@
 
 body{
 font-family:Poppins;
-background:linear-gradient(135deg,#1a0a0a,#2d1515);
+background:linear-gradient(135deg,#1a0a0a,#2d1515,#1a0a0a);
 color:white;
 overflow-x:hidden;
 }
 
 .title{
 font-family:"Dancing Script";
-font-size:60px;
+font-size:65px;
 text-align:center;
 margin-top:40px;
 color:#ff9ac9;
+animation:float 4s ease-in-out infinite;
+}
+
+.quote{
+text-align:center;
+max-width:700px;
+margin:auto;
+font-size:18px;
+margin-top:20px;
+color:#ffd9ec;
+}
+
+.section{
+max-width:1000px;
+margin:auto;
+padding:20px;
+}
+
+.timer{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+text-align:center;
+margin-top:40px;
+}
+
+.timer div{
+background:rgba(255,255,255,0.05);
+padding:20px;
+border-radius:15px;
+font-size:32px;
 }
 
 .gallery{
@@ -49,25 +81,73 @@ transition:0.4s;
 transform:scale(1.05);
 }
 
-.section{
-max-width:900px;
-margin:auto;
-padding:20px;
-}
-
-.timer{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:10px;
-text-align:center;
-font-size:30px;
-margin-top:30px;
-}
-
 .music{
 margin-top:40px;
 border-radius:20px;
 overflow:hidden;
+}
+
+footer{
+text-align:center;
+margin-top:50px;
+font-size:22px;
+color:#ffb6d9;
+font-family:"Dancing Script";
+}
+
+@keyframes float{
+
+0%,100%{transform:translateY(0)}
+50%{transform:translateY(-10px)}
+
+}
+
+.heart{
+position:fixed;
+top:-10px;
+font-size:20px;
+animation:fall 8s linear infinite;
+opacity:0.7;
+}
+
+@keyframes fall{
+
+0%{
+transform:translateY(-10px) rotate(0);
+}
+
+100%{
+transform:translateY(110vh) rotate(360deg);
+}
+
+}
+
+.popup{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.8);
+display:flex;
+justify-content:center;
+align-items:center;
+z-index:10;
+}
+
+.popup-box{
+background:#2d1515;
+padding:30px;
+border-radius:20px;
+text-align:center;
+max-width:300px;
+}
+
+button{
+background:#ff6fae;
+padding:10px 20px;
+border-radius:10px;
+margin-top:15px;
 }
 
 </style>
@@ -75,6 +155,27 @@ overflow:hidden;
 </head>
 
 <body>
+
+<!-- popup -->
+
+<div class="popup" id="popup">
+
+<div class="popup-box">
+
+<h2 style="font-family:Dancing Script;font-size:35px">
+Para Layla ❤️
+</h2>
+
+<p>
+Esse site é só uma pequena forma de mostrar o quanto você é especial para mim.
+</p>
+
+<button onclick="startSite()">
+Abrir ❤️
+</button>
+
+</div>
+
 
 <h1 class="title">João e Layla ❤️</h1>
 
