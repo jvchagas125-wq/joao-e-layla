@@ -6,6 +6,8 @@
 <title>Admin — João &amp; Layla</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,600;1,500&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --night:#1c0f22; --wine:#5c2a4d; --rose:#f4b8c7; --gold:#d9a95c; --cream:#faf1e4; --ink:#2a1420;
@@ -56,14 +58,14 @@
 
 <div id="gate">
   <h1 style="font-size:20px;">Painel admin</h1>
-  <input type="text" id="pin" placeholder="PIN de acesso" autocomplete="off">
+  <input type="text" id="pin" placeholder="Senha de acesso" autocomplete="off">
   <button id="pinBtn">Entrar</button>
   <p class="status err" id="gateMsg"></p>
 </div>
 
 <div class="wrap">
   <h1>Painel admin</h1>
-  <p class="sub">Edite o site — as mudanças ficam salvas no Cloudinary. <a class="view-link" href="index.html" target="_blank">Ver site ›</a></p>
+  <p class="sub">Edite o site — as mudanças ficam salvas no Firebase. <a class="view-link" href="index.html" target="_blank">Ver site ›</a> · <a class="view-link" href="#" id="logoutLink">Sair</a></p>
 
   <div class="card">
     <h2>Informações gerais</h2>
@@ -110,15 +112,26 @@
 const CLOUD_NAME = "dcvqnr1c";
 const UPLOAD_PRESET = "joao-e-layla";
 const CLOUD_FOLDER = "joao-e-layla";
-const CONFIG_URL = `https://res.cloudinary.com/${CLOUD_NAME}/raw/upload/${CLOUD_FOLDER}/config.json`;
 const IMAGE_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`;
 const VIDEO_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/video/upload`; // áudio entra como "video" no Cloudinary
-const RAW_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUD_NAME}/raw/upload`;
 
-// TROQUE ESTE PIN antes de publicar o site. Isto NÃO é uma senha segura de
+// COLE AQUI o mesmo firebaseConfig que você colocou no index.html
+const firebaseConfig = {
+  apiKey: "AIzaSyDnugxfNXW09jGbmmcAE9oSJti-BysV4TE",
+  authDomain: "joao-e-layla.firebaseapp.com",
+  projectId: "joao-e-layla",
+  storageBucket: "joao-e-layla.firebasestorage.app",
+  messagingSenderId: "880253633786",
+  appId: "1:880253633786:web:e0a194fb993dfad4c47543"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// TROQUE ESTA SENHA antes de publicar o site. Isto NÃO é uma senha segura de
 // verdade (é só client-side) — serve para afastar visitantes casuais.
 // Não compartilhe o link deste admin.html com ninguém além de você.
-const ADMIN_PIN = "layla2024";
+const ADMIN_PIN = "JVlayla2803*";
+const REMEMBER_KEY = "joaoelayla_admin_ok";
 
 const DEFAULT_CONFIG = {
   partner1: "João",
@@ -146,21 +159,36 @@ let CONFIG = null;
 // ---------- Gate ----------
 document.getElementById('pinBtn').addEventListener('click', checkPin);
 document.getElementById('pin').addEventListener('keydown', e => { if (e.key === 'Enter') checkPin(); });
+
+function enterAdmin(){
+  document.getElementById('gate').style.display = 'none';
+  init();
+}
 function checkPin(){
   const val = document.getElementById('pin').value;
   if (val === ADMIN_PIN){
-    document.getElementById('gate').style.display = 'none';
-    init();
+    localStorage.setItem(REMEMBER_KEY, 'true');
+    enterAdmin();
   } else {
-    document.getElementById('gateMsg').textContent = 'PIN incorreto.';
+    document.getElementById('gateMsg').textContent = 'Senha incorreta.';
   }
+}
+document.getElementById('logoutLink').addEventListener('click', (e) => {
+  e.preventDefault();
+  localStorage.removeItem(REMEMBER_KEY);
+  location.reload();
+});
+
+// Se já entrou antes neste navegador, pula a tela de senha
+if (localStorage.getItem(REMEMBER_KEY) === 'true'){
+  enterAdmin();
 }
 
 // ---------- Init ----------
 async function init(){
   try{
-    const res = await fetch(CONFIG_URL + "?t=" + Date.now(), { cache: "no-store" });
-    CONFIG = res.ok ? Object.assign({}, DEFAULT_CONFIG, await res.json()) : JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+    const doc = await db.collection('site').doc('config').get();
+    CONFIG = doc.exists ? Object.assign({}, DEFAULT_CONFIG, doc.data()) : JSON.parse(JSON.stringify(DEFAULT_CONFIG));
   }catch(e){
     CONFIG = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
   }
@@ -296,20 +324,10 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   btn.disabled = true;
   setStatus('Salvando...', '');
   try{
-    const blob = new Blob([JSON.stringify(CONFIG, null, 2)], { type: 'application/json' });
-    const fd = new FormData();
-    fd.append('file', blob, 'config.json');
-    fd.append('upload_preset', UPLOAD_PRESET);
-    fd.append('folder', CLOUD_FOLDER);
-    fd.append('public_id', 'config');
-    fd.append('overwrite', 'true');
-    fd.append('invalidate', 'true');
-    const res = await fetch(RAW_UPLOAD_URL, { method: 'POST', body: fd });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.error ? data.error.message : 'erro ao salvar');
-    setStatus('Salvo! O site pode levar alguns minutos para atualizar (cache).', 'ok');
+    await db.collection('site').doc('config').set(CONFIG);
+    setStatus('Salvo! Já pode atualizar o site que a mudança aparece.', 'ok');
   }catch(e){
-    setStatus('Não foi possível salvar: ' + e.message + ' — confira se o preset "joao-e-layla" está com Overwrite habilitado no Cloudinary.', 'err');
+    setStatus('Não foi possível salvar: ' + e.message + ' — confira as regras do Firestore e se o firebaseConfig está certo.', 'err');
   }
   btn.disabled = false;
 });
