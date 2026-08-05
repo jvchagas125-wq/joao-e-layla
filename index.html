@@ -6,6 +6,8 @@
 <title id="pageTitle">João &amp; Layla</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,500;1,600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore-compat.js"></script>
 <style>
   :root{
     --night:#1c0f22;
@@ -217,7 +219,19 @@
 ====================================================== */
 const CLOUD_NAME = "dcvqnr1c";
 const CLOUD_FOLDER = "joao-e-layla";
-const CONFIG_URL = `https://res.cloudinary.com/${CLOUD_NAME}/raw/upload/${CLOUD_FOLDER}/config.json`;
+
+// COLE AQUI o firebaseConfig que aparece no console do Firebase
+// (Configurações do projeto > Seus aplicativos > ícone Web)
+const firebaseConfig = {
+  apiKey: "AIzaSyDnugxfNXW09jGbmmcAE9oSJti-BysV4TE",
+  authDomain: "joao-e-layla.firebaseapp.com",
+  projectId: "joao-e-layla",
+  storageBucket: "joao-e-layla.firebasestorage.app",
+  messagingSenderId: "880253633786",
+  appId: "1:880253633786:web:e0a194fb993dfad4c47543"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 const DEFAULT_CONFIG = {
   partner1: "João",
@@ -245,12 +259,11 @@ let startDate = new Date(DEFAULT_CONFIG.sinceDate + ":00-03:00");
 
 async function loadConfig(){
   try{
-    const res = await fetch(CONFIG_URL + "?t=" + Date.now(), { cache: "no-store" });
-    if (res.ok){
-      const remote = await res.json();
-      CONFIG = Object.assign({}, DEFAULT_CONFIG, remote);
+    const doc = await db.collection('site').doc('config').get();
+    if (doc.exists){
+      CONFIG = Object.assign({}, DEFAULT_CONFIG, doc.data());
     }
-  }catch(e){ /* usa DEFAULT_CONFIG se ainda não existir config.json */ }
+  }catch(e){ /* usa DEFAULT_CONFIG se ainda não existir nenhum documento salvo */ }
   render();
 }
 
