@@ -70,34 +70,6 @@
   .countdown .num{font-family:'Fraunces', serif; font-weight:600; font-size:26px; display:block; color:var(--rose);}
   .countdown .lbl{font-size:10px; opacity:0.55; text-transform:uppercase; letter-spacing:0.08em;}
 
-  .story-row{display:flex; gap:16px; overflow-x:auto; padding:6px 2px 10px; scrollbar-width:none;}
-  .story-row::-webkit-scrollbar{display:none;}
-  .story{flex-shrink:0; width:74px; text-align:center; cursor:pointer; background:none; border:none; color:inherit; font-family:inherit;}
-  .story .ring{
-    width:66px; height:66px; border-radius:50%;
-    padding:3px; background:conic-gradient(from 220deg, var(--gold), var(--rose), var(--gold));
-    margin:0 auto 8px;
-  }
-  .story .ring-inner{width:100%; height:100%; border-radius:50%; padding:2px; background:var(--night);}
-  .story img{width:100%; height:100%; object-fit:cover; border-radius:50%; display:block;}
-  .story .placeholder{width:100%; height:100%; border-radius:50%; display:flex; align-items:center; justify-content:center; background:linear-gradient(135deg, var(--wine), var(--night)); font-size:18px;}
-  .story .cap{font-size:10.5px; opacity:0.7; line-height:1.2;}
-
-  #viewer{position:fixed; inset:0; background:#000; z-index:60; display:none; flex-direction:column;}
-  #viewer.open{display:flex;}
-  .viewer-bars{display:flex; gap:4px; padding:10px 10px 0;}
-  .viewer-bars .bar{flex:1; height:2.5px; background:rgba(255,255,255,0.25); border-radius:2px; overflow:hidden;}
-  .viewer-bars .bar .fill{height:100%; width:0%; background:#fff;}
-  .viewer-top{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; color:#fff;}
-  .viewer-top .who{display:flex; align-items:center; gap:8px; font-size:13px; opacity:0.9;}
-  .viewer-top .who .dot{width:26px; height:26px; border-radius:50%; background:linear-gradient(135deg,var(--gold),var(--rose));}
-  .viewer-top button{background:none; border:none; color:#fff; font-size:20px; cursor:pointer; padding:4px 8px;}
-  .viewer-body{flex:1; position:relative; display:flex; align-items:center; justify-content:center; overflow:hidden;}
-  .viewer-body img{width:100%; height:100%; object-fit:cover;}
-  .viewer-body .caption{position:absolute; bottom:26px; left:0; right:0; text-align:center; color:#fff; font-family:'Fraunces', serif; font-style:italic; font-size:16px; text-shadow:0 2px 12px rgba(0,0,0,0.6); padding:0 20px;}
-  .viewer-nav{position:absolute; inset:0; display:flex;}
-  .viewer-nav div{flex:1;}
-
   .player-card{background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:22px; overflow:hidden;}
   .player-art{position:relative; width:100%; aspect-ratio:1/1; overflow:hidden; background:linear-gradient(135deg, var(--wine), var(--night));}
   .player-art img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity 1s ease;}
@@ -167,16 +139,10 @@
   }
   #openBtn:active, .controls .play:active, .letter-btn:active, .modal-btn:active{transform:scale(0.93);}
   .controls button:not(.play):hover{transform:scale(1.12); color:var(--rose);}
-  .story:active .ring{transform:scale(0.92);}
-  .story .ring{transition:transform 0.2s ease;}
 
   /* ====================== Scroll reveal ====================== */
   .reveal{opacity:0; transform:translateY(22px); transition:opacity 0.7s ease, transform 0.7s ease;}
   .reveal.in-view{opacity:1; transform:translateY(0);}
-
-  /* ====================== Stagger nos stories ====================== */
-  .story{opacity:0; transform:translateY(10px) scale(0.94); animation:storyIn 0.5s ease forwards;}
-  @keyframes storyIn{to{opacity:1; transform:translateY(0) scale(1);}}
 
   /* ====================== Carta surpresa ====================== */
   .letter-section{text-align:center;}
@@ -231,7 +197,6 @@
   <main id="main">
 
     <section class="hero reveal in-view">
-      <div class="eyebrow" id="eyebrowDate">desde</div>
       <h1 id="heroTitle"></h1>
       <p class="since" id="sinceLabel"></p>
 
@@ -243,11 +208,6 @@
         <div class="cell"><span class="num" id="minutes">0</span><span class="lbl">min</span></div>
         <div class="cell"><span class="num" id="seconds">0</span><span class="lbl">seg</span></div>
       </div>
-    </section>
-
-    <section class="reveal">
-      <div class="eyebrow">nossos momentos</div>
-      <div class="story-row" id="storyRow"></div>
     </section>
 
     <section class="reveal">
@@ -303,19 +263,6 @@
   </div>
 </div>
 
-<div id="viewer">
-  <div class="viewer-bars" id="viewerBars"></div>
-  <div class="viewer-top">
-    <div class="who"><div class="dot"></div><span id="viewerName">Nós dois</span></div>
-    <button id="viewerClose" aria-label="Fechar">✕</button>
-  </div>
-  <div class="viewer-body">
-    <img id="viewerImg">
-    <div class="caption" id="viewerCaption"></div>
-    <div class="viewer-nav"><div id="navPrev"></div><div id="navNext"></div></div>
-  </div>
-</div>
-
 <script>
 /* ======================================================
    Este site lê as informações (título, data, fotos, música)
@@ -352,14 +299,6 @@ const DEFAULT_CONFIG = {
   youtubeUrl: "",
   loveLetterTitle: "Uma cartinha para você",
   loveLetter: "",
-  stories: [
-    { name: "1º encontro", caption: "Onde tudo começou", imageUrl: "" },
-    { name: "Primeira viagem", caption: "Nossa primeira viagem juntos", imageUrl: "" },
-    { name: "Dia especial", caption: "Um dia que não esqueço", imageUrl: "" },
-    { name: "Risadas", caption: "Sempre rindo com você", imageUrl: "" },
-    { name: "Aniversário", caption: "Comemorando mais um ano", imageUrl: "" },
-    { name: "Hoje", caption: "E hoje, ainda apaixonado", imageUrl: "" }
-  ],
   playerPhotoUrls: []
 };
 
@@ -479,36 +418,9 @@ function render(){
   startDate = new Date(CONFIG.sinceDate + ":00-03:00");
   updateTimer();
 
-  const storyRow = document.getElementById('storyRow');
-  storyRow.innerHTML = "";
-  CONFIG.stories.forEach((s, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'story';
-    btn.innerHTML = `
-      <div class="ring"><div class="ring-inner">
-        <img src="${s.imageUrl}" alt="${s.name}">
-      </div></div>
-      <div class="cap">${s.name}</div>`;
-    const img = btn.querySelector('img');
-    placeholderFallback(img, 20);
-    btn.addEventListener('click', () => openViewer(i));
-    storyRow.appendChild(btn);
-  });
-
-  const viewerBars = document.getElementById('viewerBars');
-  viewerBars.innerHTML = "";
-  CONFIG.stories.forEach(() => {
-    const bar = document.createElement('div');
-    bar.className = 'bar';
-    bar.innerHTML = '<div class="fill"></div>';
-    viewerBars.appendChild(bar);
-  });
-
   const playerArt = document.getElementById('playerArt');
   playerArt.querySelectorAll('img').forEach(el => el.remove());
-  const photos = CONFIG.playerPhotoUrls && CONFIG.playerPhotoUrls.length
-    ? CONFIG.playerPhotoUrls
-    : CONFIG.stories.map(s => s.imageUrl).filter(Boolean).slice(0,3);
+  const photos = CONFIG.playerPhotoUrls || [];
   photos.forEach((src, i) => {
     const img = document.createElement('img');
     img.src = src;
@@ -555,56 +467,6 @@ function updateTimer(){
   document.getElementById('seconds').textContent = s;
 }
 setInterval(updateTimer, 1000);
-
-/* ====================== Story viewer ====================== */
-const viewer = document.getElementById('viewer');
-const viewerImg = document.getElementById('viewerImg');
-const viewerCaption = document.getElementById('viewerCaption');
-const viewerName = document.getElementById('viewerName');
-let currentStory = 0;
-let storyTimer = null;
-const STORY_DURATION = 4000;
-const bars = () => document.querySelectorAll('#viewerBars .fill');
-
-function openViewer(i){
-  currentStory = i;
-  viewer.classList.add('open');
-  playerPause();
-  updatePlayIcon();
-  renderStory();
-}
-function closeViewer(){
-  viewer.classList.remove('open');
-  clearTimeout(storyTimer);
-}
-function renderStory(){
-  clearTimeout(storyTimer);
-  const s = CONFIG.stories[currentStory];
-  viewerImg.src = s.imageUrl;
-  viewerCaption.textContent = s.caption;
-  viewerName.textContent = s.name;
-  bars().forEach((f, idx) => {
-    f.style.transition = 'none';
-    f.style.width = idx < currentStory ? '100%' : '0%';
-  });
-  requestAnimationFrame(() => {
-    const f = bars()[currentStory];
-    f.style.transition = `width ${STORY_DURATION}ms linear`;
-    requestAnimationFrame(() => f.style.width = '100%');
-  });
-  storyTimer = setTimeout(nextStory, STORY_DURATION);
-}
-function nextStory(){
-  if (currentStory < CONFIG.stories.length - 1){ currentStory++; renderStory(); }
-  else { closeViewer(); }
-}
-function prevStory(){
-  if (currentStory > 0){ currentStory--; renderStory(); }
-  else { renderStory(); }
-}
-document.getElementById('viewerClose').addEventListener('click', closeViewer);
-document.getElementById('navNext').addEventListener('click', nextStory);
-document.getElementById('navPrev').addEventListener('click', prevStory);
 
 /* ====================== Player ====================== */
 const audio = new Audio();
