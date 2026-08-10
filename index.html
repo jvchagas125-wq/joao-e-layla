@@ -203,42 +203,62 @@
   .reveal{opacity:0; transform:translateY(22px); transition:opacity 0.7s ease, transform 0.7s ease;}
   .reveal.in-view{opacity:1; transform:translateY(0);}
 
-  /* ====================== Carta surpresa ====================== */
-  .letter-section{text-align:center;}
+  /* ====================== Botão "carta surpresa" ====================== */
   .letter-btn{
-    display:inline-flex; align-items:center; gap:8px; margin-top:6px;
-    background:rgba(255,255,255,0.06); border:1px solid rgba(217,169,92,0.35); color:var(--cream);
-    padding:13px 26px; border-radius:999px; font-family:'Space Grotesk', sans-serif; font-size:13px; font-weight:500;
+    display:inline-flex; align-items:center; gap:8px; margin-top:22px;
+    background:linear-gradient(120deg, rgba(217,169,92,0.16), rgba(244,184,199,0.16));
+    border:1px solid rgba(217,169,92,0.4); color:var(--cream);
+    padding:14px 28px; border-radius:999px; font-family:'Fraunces', serif; font-style:italic;
+    font-weight:600; font-size:14.5px;
     cursor:pointer; box-shadow:0 0 0 rgba(217,169,92,0);
-    animation:letterShimmer 2.6s ease-in-out infinite;
+    animation:letterShimmer 2.6s ease-in-out infinite, letterBob 3s ease-in-out infinite;
   }
   @keyframes letterShimmer{
     0%,100%{box-shadow:0 0 0 rgba(217,169,92,0);}
-    50%{box-shadow:0 0 18px rgba(217,169,92,0.22);}
+    50%{box-shadow:0 0 20px rgba(217,169,92,0.28);}
   }
+  @keyframes letterBob{0%,100%{transform:translateY(0);} 50%{transform:translateY(-3px);}}
+  .letter-btn:active{transform:scale(0.93) !important;}
 
-  /* ====================== Modal genérico (site) ====================== */
-  .modal-overlay{
-    position:fixed; inset:0; background:rgba(10,4,10,0.72); backdrop-filter:blur(3px);
-    display:flex; align-items:center; justify-content:center; z-index:80; padding:24px;
-    opacity:0; visibility:hidden; transition:opacity 0.35s ease, visibility 0.35s;
+  /* ====================== Página da carta (tela cheia) ====================== */
+  .letter-page{
+    position:fixed; inset:0; z-index:90; overflow-y:auto;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(244,184,199,0.15), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(217,169,92,0.12), transparent),
+      linear-gradient(180deg, var(--night) 0%, var(--ink) 100%);
+    opacity:0; visibility:hidden; pointer-events:none;
+    transform:translateY(4%) scale(0.98);
+    transition:opacity 0.6s cubic-bezier(.22,.9,.24,1), transform 0.6s cubic-bezier(.22,.9,.24,1), visibility 0.6s;
   }
-  .modal-overlay.open{opacity:1; visibility:visible;}
-  .modal-box{
+  .letter-page.open{opacity:1; visibility:visible; pointer-events:auto; transform:translateY(0) scale(1);}
+  .letter-page-hearts{position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:0;}
+  .letter-page-back{
+    position:fixed; top:18px; left:16px; z-index:2;
+    display:inline-flex; align-items:center; gap:6px;
+    background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.1); color:var(--cream);
+    padding:9px 16px 9px 12px; border-radius:999px; font-family:'Space Grotesk', sans-serif; font-size:12.5px; font-weight:500;
+    cursor:pointer;
+  }
+  .letter-page-back svg{width:15px; height:15px;}
+  .letter-page-scroll{
+    min-height:100%; display:flex; align-items:center; justify-content:center;
+    padding:90px 22px 60px; position:relative; z-index:1;
+  }
+  .letter-page-card{
+    max-width:420px; width:100%;
     background:linear-gradient(165deg, #2a1626, #1c0f1f); border:1px solid rgba(217,169,92,0.25);
-    border-radius:20px; max-width:380px; width:100%; padding:28px 24px 24px; position:relative;
-    box-shadow:0 30px 70px rgba(0,0,0,0.55); transform:translateY(18px) scale(0.97); transition:transform 0.4s cubic-bezier(.2,.9,.3,1.2);
-    max-height:80vh; overflow-y:auto;
+    border-radius:22px; padding:38px 28px; text-align:center;
+    box-shadow:0 30px 70px rgba(0,0,0,0.55);
+    opacity:0; transform:translateY(18px);
+    transition:opacity 0.7s ease 0.15s, transform 0.7s cubic-bezier(.22,.9,.24,1) 0.15s;
   }
-  .modal-overlay.open .modal-box{transform:translateY(0) scale(1);}
-  .modal-box .modal-close{
-    position:absolute; top:14px; right:16px; background:none; border:none; color:var(--cream); opacity:0.5;
-    font-size:18px; cursor:pointer; padding:4px;
-  }
-  .modal-box h3{font-family:'Fraunces', serif; font-style:italic; font-weight:500; font-size:19px; margin:0 0 12px; color:var(--rose); padding-right:20px;}
-  .modal-box p{font-size:13.5px; line-height:1.7; opacity:0.85; white-space:pre-wrap; margin:0;}
-  .modal-box .modal-heart{font-size:20px; text-align:center; margin-bottom:6px; color:var(--rose); animation:pulse 2.2s ease-in-out infinite;}
-</style>
+  .letter-page.open .letter-page-card{opacity:1; transform:translateY(0);}
+  .letter-page-heart{font-size:26px; color:var(--rose); margin-bottom:14px; animation:pulse 2.2s ease-in-out infinite;}
+  .letter-page-card h2{font-family:'Fraunces', serif; font-style:italic; font-weight:500; font-size:23px; margin:0 0 16px; color:var(--rose);}
+  .letter-page-divider{width:46px; height:1px; margin:0 auto 22px; background:linear-gradient(90deg, transparent, var(--gold), transparent);}
+  .letter-page-card p{font-size:14.5px; line-height:1.9; opacity:0.9; white-space:pre-wrap; margin:0; text-align:left;}
+  .letter-page-sign{display:block; margin-top:24px; font-size:11px; opacity:0.5; font-style:normal; letter-spacing:0.08em; text-transform:uppercase;}
 </head>
 <body>
 
@@ -308,14 +328,10 @@
       </div>
     </section>
 
-    <section class="letter-section reveal" id="letterSection" style="display:none;">
-      <div class="eyebrow">para você</div>
-      <button class="letter-btn" id="letterBtn">✉ Abrir nossa carta</button>
-    </section>
-
     <footer>
       <p id="footerMessage"></p>
       <span class="sign" id="footerSign"></span>
+      <button class="letter-btn" id="letterBtn" style="display:none;">Uma cartinha para você 🥰</button>
     </footer>
 
   </main>
@@ -323,12 +339,20 @@
 
 <a class="admin-link" href="admin.html">admin</a>
 
-<div class="modal-overlay" id="letterModal">
-  <div class="modal-box">
-    <button class="modal-close" id="letterModalClose" aria-label="Fechar">✕</button>
-    <div class="modal-heart">♥</div>
-    <h3 id="letterModalTitle">Uma cartinha para você</h3>
-    <p id="letterModalBody"></p>
+<div class="letter-page" id="letterPage">
+  <div class="letter-page-hearts" id="letterPageHearts"></div>
+  <button class="letter-page-back" id="letterPageBack" aria-label="Voltar">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 4.5 8 12l7.5 7.5 1.4-1.4L10.8 12l6.1-6.1z"/></svg>
+    Voltar
+  </button>
+  <div class="letter-page-scroll">
+    <div class="letter-page-card">
+      <div class="letter-page-heart">♥</div>
+      <h2 id="letterPageTitle">Uma cartinha para você</h2>
+      <div class="letter-page-divider"></div>
+      <p id="letterPageBody"></p>
+      <span class="letter-page-sign" id="letterPageSign"></span>
+    </div>
   </div>
 </div>
 
@@ -465,14 +489,42 @@ function initScrollReveal(){
   items.forEach(el => io.observe(el));
 }
 
-/* ====================== Carta surpresa (modal) ====================== */
-const letterModal = document.getElementById('letterModal');
-function openLetterModal(){ letterModal.classList.add('open'); }
-function closeLetterModal(){ letterModal.classList.remove('open'); }
-document.getElementById('letterBtn').addEventListener('click', openLetterModal);
-document.getElementById('letterModalClose').addEventListener('click', closeLetterModal);
-letterModal.addEventListener('click', (e) => { if (e.target === letterModal) closeLetterModal(); });
-document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLetterModal(); });
+/* ====================== Carta surpresa (página cheia) ====================== */
+const letterPage = document.getElementById('letterPage');
+const letterPageHearts = document.getElementById('letterPageHearts');
+let letterHeartsSpawned = false;
+
+function spawnLetterHearts(){
+  if (letterHeartsSpawned) return;
+  letterHeartsSpawned = true;
+  const glyphs = ['♥','♡'];
+  for (let i = 0; i < 16; i++){
+    const el = document.createElement('span');
+    el.className = 'floaty';
+    el.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
+    el.style.left = Math.random() * 100 + '%';
+    el.style.fontSize = (12 + Math.random() * 16) + 'px';
+    el.style.animationDuration = (10 + Math.random() * 10) + 's';
+    el.style.animationDelay = (Math.random() * 10) + 's';
+    el.style.setProperty('--drift', (Math.random() * 60 - 30) + 'px');
+    el.style.setProperty('--spin', (Math.random() * 40 - 20) + 'deg');
+    letterPageHearts.appendChild(el);
+  }
+}
+
+function openLetterPage(){
+  spawnLetterHearts();
+  letterPage.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  // a música de fundo continua tocando normalmente
+}
+function closeLetterPage(){
+  letterPage.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('letterBtn').addEventListener('click', openLetterPage);
+document.getElementById('letterPageBack').addEventListener('click', closeLetterPage);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLetterPage(); });
 
 function render(){
   document.title = `${CONFIG.partner1} & ${CONFIG.partner2}`;
@@ -501,14 +553,15 @@ function render(){
 
   setupPlayerSource();
 
-  const letterSection = document.getElementById('letterSection');
+  const letterBtn = document.getElementById('letterBtn');
   const letterBody = (CONFIG.loveLetter || '').trim();
   if (letterBody){
-    letterSection.style.display = '';
-    document.getElementById('letterModalTitle').textContent = CONFIG.loveLetterTitle || 'Uma cartinha para você';
-    document.getElementById('letterModalBody').textContent = letterBody;
+    letterBtn.style.display = '';
+    document.getElementById('letterPageTitle').textContent = CONFIG.loveLetterTitle || 'Uma cartinha para você';
+    document.getElementById('letterPageBody').textContent = letterBody;
+    document.getElementById('letterPageSign').textContent = CONFIG.footerSign;
   } else {
-    letterSection.style.display = 'none';
+    letterBtn.style.display = 'none';
   }
 
   initScrollReveal();
