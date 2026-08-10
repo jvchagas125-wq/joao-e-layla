@@ -151,6 +151,13 @@
     <div id="playerPhotosWrap"></div>
   </div>
 
+  <div class="card">
+    <h2>Galeria de fotos</h2>
+    <p class="field-hint" style="margin:0 0 12px;">Se adicionar fotos aqui, um botão "Ver galeria" aparece no final da carta surpresa, abrindo um álbum com título e mensagem para cada foto.</p>
+    <div id="galleryWrap"></div>
+    <button type="button" id="addGalleryBtn" style="margin-top:6px; padding:10px 18px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:var(--cream); font-size:13px;">+ Adicionar foto</button>
+  </div>
+
   <button class="save-btn" id="saveBtn">Salvar alterações</button>
   <p class="status" id="statusMsg"></p>
 </div>
@@ -202,7 +209,8 @@ const DEFAULT_CONFIG = {
   youtubeUrl: "",
   loveLetterTitle: "Uma cartinha para você",
   loveLetter: "",
-  playerPhotoUrls: []
+  playerPhotoUrls: [],
+  gallery: []
 };
 
 let CONFIG = null;
@@ -322,6 +330,7 @@ function fillForm(){
   });
 
   renderPlayerPhotos();
+  renderGallery();
 }
 
 function currentPlayerUrls(){
@@ -378,6 +387,79 @@ function renderPlayerPhotos(){
 function escapeHtml(str){
   return (str || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 }
+
+function currentGallery(){
+  return CONFIG.gallery || [];
+}
+
+function renderGallery(){
+  const wrap = document.getElementById('galleryWrap');
+  wrap.innerHTML = "";
+  const items = currentGallery();
+  items.forEach((item, i) => {
+    const block = document.createElement('div');
+    block.className = 'story-block';
+    block.innerHTML = `
+      <label>Foto ${i + 1}</label>
+      <div class="thumb-row">
+        <img class="thumb" src="${item.url || ''}" style="${item.url ? '' : 'opacity:0;'}" onerror="this.style.opacity=0">
+        <input type="file" accept="image/*" data-gallery-upload="${i}">
+        <button type="button" class="del-photo-btn" data-gallery-remove="${i}">Remover</button>
+      </div>
+      <label>Título</label>
+      <input type="text" data-gallery-title="${i}" value="${escapeHtml(item.title || '')}" placeholder="Ex: Nosso primeiro encontro">
+      <label>Mensagem curta</label>
+      <textarea data-gallery-message="${i}" placeholder="Uma frase curta sobre essa foto...">${escapeHtml(item.message || '')}</textarea>
+    `;
+    wrap.appendChild(block);
+  });
+
+  wrap.querySelectorAll('input[type=file][data-gallery-upload]').forEach(el => {
+    el.addEventListener('change', async () => {
+      const i = Number(el.dataset.galleryUpload);
+      const file = el.files[0];
+      if (!file) return;
+      setStatus('Enviando foto...', '');
+      try{
+        const url = await uploadToCloudinary(file, IMAGE_UPLOAD_URL);
+        currentGallery()[i].url = url;
+        renderGallery();
+        setStatus('Foto enviada ✓', 'ok');
+      }catch(e){ setStatus('Falha ao enviar a foto: ' + e.message, 'err'); }
+    });
+  });
+  wrap.querySelectorAll('input[data-gallery-title]').forEach(el => {
+    el.addEventListener('input', () => {
+      currentGallery()[Number(el.dataset.galleryTitle)].title = el.value;
+    });
+  });
+  wrap.querySelectorAll('textarea[data-gallery-message]').forEach(el => {
+    el.addEventListener('input', () => {
+      currentGallery()[Number(el.dataset.galleryMessage)].message = el.value;
+    });
+  });
+  wrap.querySelectorAll('button[data-gallery-remove]').forEach(el => {
+    el.addEventListener('click', async () => {
+      const i = Number(el.dataset.galleryRemove);
+      const ok = await confirmModal('Remover essa foto da galeria?', 'Isso vai remover a foto, o título e a mensagem dela.', 'Remover');
+      if (!ok) return;
+      currentGallery().splice(i, 1);
+      renderGallery();
+      setStatus('Foto removida — clique em Salvar para confirmar.', 'ok');
+    });
+  });
+}
+
+document.getElementById('addGalleryBtn').addEventListener('click', () => {
+  const items = currentGallery();
+  if (items.length >= 12){
+    alertModal('Limite atingido', 'Você pode adicionar até 12 fotos na galeria.', '✕');
+    return;
+  }
+  items.push({ url: '', title: '', message: '' });
+  CONFIG.gallery = items;
+  renderGallery();
+});
 
 async function uploadToCloudinary(file, endpoint){
   const fd = new FormData();
