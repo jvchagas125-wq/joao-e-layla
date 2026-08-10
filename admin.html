@@ -51,7 +51,47 @@
 
   #gate{position:fixed; inset:0; background:var(--night); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; z-index:99;}
   #gate input{width:220px;}
-  #gate button{padding:10px 24px; background:var(--gold); color:var(--ink);}
+  #gate button{padding:10px 24px; background:var(--gold); color:var(--ink); transition:transform 0.15s ease;}
+  #gate button:active{transform:scale(0.94);}
+
+  /* ====================== Microinterações / animações ====================== */
+  @keyframes fadeSlideUp{from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);}}
+  .card{animation:fadeSlideUp 0.5s ease both;}
+  .card:nth-of-type(1){animation-delay:0.02s;}
+  .card:nth-of-type(2){animation-delay:0.08s;}
+  .card:nth-of-type(3){animation-delay:0.14s;}
+  .card:nth-of-type(4){animation-delay:0.2s;}
+  input, textarea, button{transition:transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;}
+  input:focus, textarea:focus{outline:none; border-color:var(--gold); box-shadow:0 0 0 3px rgba(217,169,92,0.15);}
+  .save-btn:active{transform:scale(0.97);}
+  .thumb{transition:transform 0.2s ease;}
+  .thumb-row:hover .thumb{transform:scale(1.06);}
+  .del-photo-btn{background:none; border:1px solid rgba(224,138,138,0.4); color:var(--err); border-radius:999px; font-size:11px; padding:6px 12px;}
+  .del-photo-btn:hover{background:rgba(224,138,138,0.12);}
+  .field-hint{font-size:11px; opacity:0.45; margin:4px 0 0;}
+
+  /* ====================== Modal personalizado ====================== */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(10,4,10,0.72); backdrop-filter:blur(3px);
+    display:flex; align-items:center; justify-content:center; z-index:150; padding:24px;
+    opacity:0; visibility:hidden; transition:opacity 0.3s ease, visibility 0.3s;
+  }
+  .modal-overlay.open{opacity:1; visibility:visible;}
+  .modal-box{
+    background:linear-gradient(165deg, #2a1626, #1c0f1f); border:1px solid rgba(217,169,92,0.25);
+    border-radius:18px; max-width:360px; width:100%; padding:24px 22px 20px;
+    box-shadow:0 30px 70px rgba(0,0,0,0.55); transform:translateY(16px) scale(0.97);
+    transition:transform 0.35s cubic-bezier(.2,.9,.3,1.2);
+  }
+  .modal-overlay.open .modal-box{transform:translateY(0) scale(1);}
+  .modal-box .modal-icon{font-size:22px; margin-bottom:8px;}
+  .modal-box h3{font-family:'Fraunces', serif; font-weight:600; font-size:17px; margin:0 0 8px; color:var(--rose);}
+  .modal-box p{font-size:13px; line-height:1.6; opacity:0.8; margin:0 0 18px;}
+  .modal-actions{display:flex; gap:10px; justify-content:flex-end;}
+  .modal-btn{padding:9px 18px; font-size:12.5px; border-radius:999px; cursor:pointer;}
+  .modal-btn:active{transform:scale(0.94);}
+  .modal-btn.primary{background:linear-gradient(120deg, var(--gold), var(--rose)); color:var(--ink); border:none;}
+  .modal-btn.ghost{background:none; border:1px solid rgba(255,255,255,0.18); color:var(--cream);}
 </style>
 </head>
 <body>
@@ -84,11 +124,23 @@
   </div>
 
   <div class="card">
+    <h2>Carta surpresa</h2>
+    <p class="field-hint" style="margin:0 0 12px;">Se preencher o texto, um botão "Abrir nossa carta" aparece no site, que abre essa mensagem em uma janela especial.</p>
+    <label>Título da carta</label>
+    <input type="text" id="loveLetterTitle">
+    <label>Texto da carta</label>
+    <textarea id="loveLetter" style="min-height:120px;" placeholder="Escreva aqui a mensagem que vai aparecer no modal..."></textarea>
+  </div>
+
+  <div class="card">
     <h2>Música</h2>
     <label>Título da música</label>
     <input type="text" id="songTitle">
     <label>Artista</label>
     <input type="text" id="songArtist">
+    <label>Link do YouTube (opcional)</label>
+    <input type="text" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=...">
+    <p class="field-hint">Se preencher, a música toca direto do YouTube (só o áudio, sem vídeo aparecendo) e o mp3 abaixo é ignorado.</p>
     <label>Arquivo de áudio (mp3)</label>
     <input type="file" id="audioFile" accept="audio/*">
     <div class="thumb-row"><span id="audioStatus" style="font-size:12px; opacity:0.6;">nenhum áudio enviado ainda</span></div>
@@ -106,6 +158,15 @@
 
   <button class="save-btn" id="saveBtn">Salvar alterações</button>
   <p class="status" id="statusMsg"></p>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal-box">
+    <div class="modal-icon" id="modalIcon">♥</div>
+    <h3 id="modalTitle"></h3>
+    <p id="modalMsg"></p>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
 </div>
 
 <script>
@@ -143,6 +204,9 @@ const DEFAULT_CONFIG = {
   songTitle: "Nome da música",
   songArtist: "João & Layla",
   audioUrl: "",
+  youtubeUrl: "",
+  loveLetterTitle: "Uma cartinha para você",
+  loveLetter: "",
   stories: [
     { name: "1º encontro", caption: "Onde tudo começou", imageUrl: "" },
     { name: "Primeira viagem", caption: "Nossa primeira viagem juntos", imageUrl: "" },
@@ -155,6 +219,52 @@ const DEFAULT_CONFIG = {
 };
 
 let CONFIG = null;
+
+// ---------- Modal personalizado ----------
+const modalOverlay = document.getElementById('modalOverlay');
+const modalIcon = document.getElementById('modalIcon');
+const modalTitle = document.getElementById('modalTitle');
+const modalMsg = document.getElementById('modalMsg');
+const modalActions = document.getElementById('modalActions');
+
+function openModal(){ modalOverlay.classList.add('open'); }
+function closeModal(){ modalOverlay.classList.remove('open'); }
+modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+
+function alertModal(title, msg, icon){
+  return new Promise((resolve) => {
+    modalIcon.textContent = icon || '♥';
+    modalTitle.textContent = title;
+    modalMsg.textContent = msg;
+    modalActions.innerHTML = '';
+    const okBtn = document.createElement('button');
+    okBtn.className = 'modal-btn primary';
+    okBtn.textContent = 'Entendi';
+    okBtn.addEventListener('click', () => { closeModal(); resolve(); });
+    modalActions.appendChild(okBtn);
+    openModal();
+  });
+}
+
+function confirmModal(title, msg, confirmLabel){
+  return new Promise((resolve) => {
+    modalIcon.textContent = '✦';
+    modalTitle.textContent = title;
+    modalMsg.textContent = msg;
+    modalActions.innerHTML = '';
+    const cancelBtn = document.createElement('button');
+    cancelBtn.className = 'modal-btn ghost';
+    cancelBtn.textContent = 'Cancelar';
+    cancelBtn.addEventListener('click', () => { closeModal(); resolve(false); });
+    const okBtn = document.createElement('button');
+    okBtn.className = 'modal-btn primary';
+    okBtn.textContent = confirmLabel || 'Confirmar';
+    okBtn.addEventListener('click', () => { closeModal(); resolve(true); });
+    modalActions.appendChild(cancelBtn);
+    modalActions.appendChild(okBtn);
+    openModal();
+  });
+}
 
 // ---------- Gate ----------
 document.getElementById('pinBtn').addEventListener('click', checkPin);
@@ -170,7 +280,8 @@ function checkPin(){
     localStorage.setItem(REMEMBER_KEY, 'true');
     enterAdmin();
   } else {
-    document.getElementById('gateMsg').textContent = 'Senha incorreta.';
+    alertModal('Senha incorreta', 'Confira a senha e tente novamente.', '✕');
+    document.getElementById('pin').value = '';
   }
 }
 document.getElementById('logoutLink').addEventListener('click', (e) => {
@@ -204,6 +315,9 @@ function fillForm(){
   document.getElementById('footerSign').value = CONFIG.footerSign;
   document.getElementById('songTitle').value = CONFIG.songTitle;
   document.getElementById('songArtist').value = CONFIG.songArtist;
+  document.getElementById('youtubeUrl').value = CONFIG.youtubeUrl || '';
+  document.getElementById('loveLetterTitle').value = CONFIG.loveLetterTitle || '';
+  document.getElementById('loveLetter').value = CONFIG.loveLetter || '';
   if (CONFIG.audioUrl){
     document.getElementById('audioStatus').textContent = "áudio atual salvo ✓ (envie outro arquivo para substituir)";
   }
@@ -222,6 +336,7 @@ function fillForm(){
       <div class="thumb-row">
         <img class="thumb" data-thumb="${i}" src="${s.imageUrl || ''}" onerror="this.style.opacity=0">
         <input type="file" accept="image/*" data-upload="${i}">
+        <button type="button" class="del-photo-btn" data-remove="${i}" style="${s.imageUrl ? '' : 'display:none;'}">Remover</button>
       </div>`;
     storiesWrap.appendChild(block);
   });
@@ -242,9 +357,24 @@ function fillForm(){
         CONFIG.stories[i].imageUrl = url;
         storiesWrap.querySelector(`img[data-thumb="${i}"]`).src = url;
         storiesWrap.querySelector(`img[data-thumb="${i}"]`).style.opacity = 1;
+        storiesWrap.querySelector(`button[data-remove="${i}"]`).style.display = '';
         renderPlayerPicks();
         setStatus('Foto enviada ✓', 'ok');
       }catch(e){ setStatus('Falha ao enviar a foto: ' + e.message, 'err'); }
+    });
+  });
+  storiesWrap.querySelectorAll('button[data-remove]').forEach(el => {
+    el.addEventListener('click', async () => {
+      const i = el.dataset.remove;
+      const ok = await confirmModal('Remover foto?', `Isso vai remover a foto do story "${CONFIG.stories[i].name || 'sem nome'}". Você pode enviar outra depois.`, 'Remover');
+      if (!ok) return;
+      CONFIG.stories[i].imageUrl = '';
+      const img = storiesWrap.querySelector(`img[data-thumb="${i}"]`);
+      img.src = '';
+      img.style.opacity = 0;
+      el.style.display = 'none';
+      renderPlayerPicks();
+      setStatus('Foto removida — clique em Salvar para confirmar.', 'ok');
     });
   });
 
@@ -311,23 +441,31 @@ function setStatus(msg, type){
 }
 
 document.getElementById('saveBtn').addEventListener('click', async () => {
+  const ok = await confirmModal('Salvar alterações?', 'As mudanças vão substituir o que está publicado no site agora.', 'Salvar');
+  if (!ok) return;
+
   CONFIG.partner1 = document.getElementById('partner1').value;
   CONFIG.partner2 = document.getElementById('partner2').value;
   CONFIG.sinceDate = document.getElementById('sinceDate').value;
   CONFIG.sinceLabel = document.getElementById('sinceLabel').value;
   CONFIG.footerMessage = document.getElementById('footerMessage').value;
   CONFIG.footerSign = document.getElementById('footerSign').value;
+  CONFIG.loveLetterTitle = document.getElementById('loveLetterTitle').value;
+  CONFIG.loveLetter = document.getElementById('loveLetter').value;
   CONFIG.songTitle = document.getElementById('songTitle').value;
   CONFIG.songArtist = document.getElementById('songArtist').value;
+  CONFIG.youtubeUrl = document.getElementById('youtubeUrl').value.trim();
 
   const btn = document.getElementById('saveBtn');
   btn.disabled = true;
   setStatus('Salvando...', '');
   try{
     await db.collection('site').doc('config').set(CONFIG);
-    setStatus('Salvo! Já pode atualizar o site que a mudança aparece.', 'ok');
+    setStatus('', '');
+    await alertModal('Salvo com sucesso!', 'Já pode atualizar o site que a mudança aparece.', '♥');
   }catch(e){
-    setStatus('Não foi possível salvar: ' + e.message + ' — confira as regras do Firestore e se o firebaseConfig está certo.', 'err');
+    setStatus('', '');
+    await alertModal('Não foi possível salvar', e.message + ' — confira as regras do Firestore e se o firebaseConfig está certo.', '✕');
   }
   btn.disabled = false;
 });
