@@ -125,9 +125,100 @@
     .heart-mark{animation:none;}
     main, #entry{transition:none;}
   }
+
+  /* ====================== Corações flutuantes (fundo) ====================== */
+  #heartsBg{position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:1;}
+  .floaty{
+    position:absolute; bottom:-40px; color:var(--rose); opacity:0;
+    animation:floatUp linear forwards; will-change:transform, opacity;
+  }
+  @keyframes floatUp{
+    0%{transform:translateY(0) translateX(0) rotate(0deg); opacity:0;}
+    8%{opacity:0.55;}
+    90%{opacity:0.4;}
+    100%{transform:translateY(-115vh) translateX(var(--drift,20px)) rotate(var(--spin,25deg)); opacity:0;}
+  }
+
+  /* ====================== Confete (na abertura) ====================== */
+  #confettiLayer{position:fixed; inset:0; pointer-events:none; z-index:70; overflow:hidden;}
+  .confetti-piece{position:absolute; top:-10px; will-change:transform, opacity; animation:confettiFall ease-in forwards;}
+  @keyframes confettiFall{
+    0%{transform:translateY(0) rotate(0deg); opacity:1;}
+    100%{transform:translateY(105vh) rotate(var(--spin,540deg)); opacity:0.9;}
+  }
+
+  /* ====================== Glow / brilho ====================== */
+  .hero h1 .amp{position:relative; animation:glowPulse 3.2s ease-in-out infinite;}
+  @keyframes glowPulse{
+    0%,100%{text-shadow:0 0 10px rgba(244,184,199,0.25);}
+    50%{text-shadow:0 0 22px rgba(244,184,199,0.65), 0 0 6px rgba(217,169,92,0.4);}
+  }
+  .countdown .cell{transition:transform 0.35s ease, box-shadow 0.35s ease;}
+  .countdown .cell:hover, .countdown .cell:active{transform:translateY(-3px); box-shadow:0 10px 24px rgba(217,169,92,0.15);}
+  .countdown .num{animation:numberGlow 3.2s ease-in-out infinite;}
+  @keyframes numberGlow{
+    0%,100%{text-shadow:0 0 0 rgba(244,184,199,0);}
+    50%{text-shadow:0 0 12px rgba(244,184,199,0.5);}
+  }
+
+  /* ====================== Microinterações em botões ====================== */
+  #openBtn, .controls button, .save-btn, .letter-btn, .modal-btn{
+    transition:transform 0.15s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  }
+  #openBtn:active, .controls .play:active, .letter-btn:active, .modal-btn:active{transform:scale(0.93);}
+  .controls button:not(.play):hover{transform:scale(1.12); color:var(--rose);}
+  .story:active .ring{transform:scale(0.92);}
+  .story .ring{transition:transform 0.2s ease;}
+
+  /* ====================== Scroll reveal ====================== */
+  .reveal{opacity:0; transform:translateY(22px); transition:opacity 0.7s ease, transform 0.7s ease;}
+  .reveal.in-view{opacity:1; transform:translateY(0);}
+
+  /* ====================== Stagger nos stories ====================== */
+  .story{opacity:0; transform:translateY(10px) scale(0.94); animation:storyIn 0.5s ease forwards;}
+  @keyframes storyIn{to{opacity:1; transform:translateY(0) scale(1);}}
+
+  /* ====================== Carta surpresa ====================== */
+  .letter-section{text-align:center;}
+  .letter-btn{
+    display:inline-flex; align-items:center; gap:8px; margin-top:6px;
+    background:rgba(255,255,255,0.06); border:1px solid rgba(217,169,92,0.35); color:var(--cream);
+    padding:13px 26px; border-radius:999px; font-family:'Space Grotesk', sans-serif; font-size:13px; font-weight:500;
+    cursor:pointer; box-shadow:0 0 0 rgba(217,169,92,0);
+    animation:letterShimmer 2.6s ease-in-out infinite;
+  }
+  @keyframes letterShimmer{
+    0%,100%{box-shadow:0 0 0 rgba(217,169,92,0);}
+    50%{box-shadow:0 0 18px rgba(217,169,92,0.22);}
+  }
+
+  /* ====================== Modal genérico (site) ====================== */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(10,4,10,0.72); backdrop-filter:blur(3px);
+    display:flex; align-items:center; justify-content:center; z-index:80; padding:24px;
+    opacity:0; visibility:hidden; transition:opacity 0.35s ease, visibility 0.35s;
+  }
+  .modal-overlay.open{opacity:1; visibility:visible;}
+  .modal-box{
+    background:linear-gradient(165deg, #2a1626, #1c0f1f); border:1px solid rgba(217,169,92,0.25);
+    border-radius:20px; max-width:380px; width:100%; padding:28px 24px 24px; position:relative;
+    box-shadow:0 30px 70px rgba(0,0,0,0.55); transform:translateY(18px) scale(0.97); transition:transform 0.4s cubic-bezier(.2,.9,.3,1.2);
+    max-height:80vh; overflow-y:auto;
+  }
+  .modal-overlay.open .modal-box{transform:translateY(0) scale(1);}
+  .modal-box .modal-close{
+    position:absolute; top:14px; right:16px; background:none; border:none; color:var(--cream); opacity:0.5;
+    font-size:18px; cursor:pointer; padding:4px;
+  }
+  .modal-box h3{font-family:'Fraunces', serif; font-style:italic; font-weight:500; font-size:19px; margin:0 0 12px; color:var(--rose); padding-right:20px;}
+  .modal-box p{font-size:13.5px; line-height:1.7; opacity:0.85; white-space:pre-wrap; margin:0;}
+  .modal-box .modal-heart{font-size:20px; text-align:center; margin-bottom:6px; color:var(--rose); animation:pulse 2.2s ease-in-out infinite;}
 </style>
 </head>
 <body>
+
+<div id="heartsBg"></div>
+<div id="confettiLayer"></div>
 
 <div id="entry">
   <div class="heart-mark">♥</div>
@@ -139,7 +230,7 @@
 <div class="frame">
   <main id="main">
 
-    <section class="hero">
+    <section class="hero reveal in-view">
       <div class="eyebrow" id="eyebrowDate">desde</div>
       <h1 id="heroTitle"></h1>
       <p class="since" id="sinceLabel"></p>
@@ -154,17 +245,18 @@
       </div>
     </section>
 
-    <section>
+    <section class="reveal">
       <div class="eyebrow">nossos momentos</div>
       <div class="story-row" id="storyRow"></div>
     </section>
 
-    <section>
+    <section class="reveal">
       <div class="eyebrow">nossa trilha sonora</div>
       <div class="player-card">
         <div class="player-art" id="playerArt">
           <div class="veil"></div>
         </div>
+        <div id="ytPlayerHost" style="position:absolute; width:1px; height:1px; opacity:0; pointer-events:none; overflow:hidden;"></div>
         <div class="player-info">
           <p class="title" id="songTitle">—</p>
           <p class="artist" id="songArtist">—</p>
@@ -187,6 +279,11 @@
       </div>
     </section>
 
+    <section class="letter-section reveal" id="letterSection" style="display:none;">
+      <div class="eyebrow">para você</div>
+      <button class="letter-btn" id="letterBtn">✉ Abrir nossa carta</button>
+    </section>
+
     <footer>
       <p id="footerMessage"></p>
       <span class="sign" id="footerSign"></span>
@@ -196,6 +293,15 @@
 </div>
 
 <a class="admin-link" href="admin.html">admin</a>
+
+<div class="modal-overlay" id="letterModal">
+  <div class="modal-box">
+    <button class="modal-close" id="letterModalClose" aria-label="Fechar">✕</button>
+    <div class="modal-heart">♥</div>
+    <h3 id="letterModalTitle">Uma cartinha para você</h3>
+    <p id="letterModalBody"></p>
+  </div>
+</div>
 
 <div id="viewer">
   <div class="viewer-bars" id="viewerBars"></div>
@@ -243,6 +349,9 @@ const DEFAULT_CONFIG = {
   songTitle: "Nome da música",
   songArtist: "João & Layla",
   audioUrl: "",
+  youtubeUrl: "",
+  loveLetterTitle: "Uma cartinha para você",
+  loveLetter: "",
   stories: [
     { name: "1º encontro", caption: "Onde tudo começou", imageUrl: "" },
     { name: "Primeira viagem", caption: "Nossa primeira viagem juntos", imageUrl: "" },
@@ -277,6 +386,85 @@ function placeholderFallback(el, iconSize){
     el.replaceWith(ph);
   }, { once:true });
 }
+
+/* ====================== Corações flutuantes ====================== */
+const heartsBg = document.getElementById('heartsBg');
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+function spawnFloatyHeart(){
+  if (reduceMotion) return;
+  const el = document.createElement('div');
+  el.className = 'floaty';
+  el.textContent = Math.random() < 0.5 ? '♥' : '✦';
+  const size = 10 + Math.random() * 16;
+  const left = Math.random() * 100;
+  const duration = 9 + Math.random() * 8;
+  const drift = (Math.random() * 120 - 60) + 'px';
+  const spin = (Math.random() * 60 - 30) + 'deg';
+  el.style.left = left + 'vw';
+  el.style.fontSize = size + 'px';
+  el.style.animationDuration = duration + 's';
+  el.style.setProperty('--drift', drift);
+  el.style.setProperty('--spin', spin);
+  heartsBg.appendChild(el);
+  setTimeout(() => el.remove(), duration * 1000 + 200);
+}
+setInterval(spawnFloatyHeart, 1400);
+for (let i = 0; i < 4; i++) setTimeout(spawnFloatyHeart, i * 500);
+
+/* ====================== Confete ====================== */
+function burstConfetti(){
+  if (reduceMotion) return;
+  const layer = document.getElementById('confettiLayer');
+  const colors = ['var(--gold)', 'var(--rose)', 'var(--wine)', 'var(--cream)'];
+  for (let i = 0; i < 46; i++){
+    const el = document.createElement('div');
+    const isHeart = Math.random() < 0.4;
+    el.className = 'confetti-piece';
+    el.style.left = (Math.random() * 100) + 'vw';
+    el.style.animationDuration = (2.4 + Math.random() * 1.6) + 's';
+    el.style.animationDelay = (Math.random() * 0.4) + 's';
+    el.style.setProperty('--spin', (Math.random() * 720 - 360) + 'deg');
+    if (isHeart){
+      el.textContent = '♥';
+      el.style.fontSize = (10 + Math.random() * 10) + 'px';
+      el.style.color = colors[Math.floor(Math.random() * colors.length)];
+    } else {
+      el.style.width = (5 + Math.random() * 6) + 'px';
+      el.style.height = (8 + Math.random() * 10) + 'px';
+      el.style.background = colors[Math.floor(Math.random() * colors.length)];
+      el.style.borderRadius = '2px';
+    }
+    layer.appendChild(el);
+    setTimeout(() => el.remove(), 4200);
+  }
+}
+
+/* ====================== Scroll reveal ====================== */
+function initScrollReveal(){
+  const items = document.querySelectorAll('.reveal:not(.in-view)');
+  if (!('IntersectionObserver' in window)){
+    items.forEach(el => el.classList.add('in-view'));
+    return;
+  }
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting){
+        entry.target.classList.add('in-view');
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.2 });
+  items.forEach(el => io.observe(el));
+}
+
+/* ====================== Carta surpresa (modal) ====================== */
+const letterModal = document.getElementById('letterModal');
+function openLetterModal(){ letterModal.classList.add('open'); }
+function closeLetterModal(){ letterModal.classList.remove('open'); }
+document.getElementById('letterBtn').addEventListener('click', openLetterModal);
+document.getElementById('letterModalClose').addEventListener('click', closeLetterModal);
+letterModal.addEventListener('click', (e) => { if (e.target === letterModal) closeLetterModal(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLetterModal(); });
 
 function render(){
   document.title = `${CONFIG.partner1} & ${CONFIG.partner2}`;
@@ -331,9 +519,19 @@ function render(){
   artImgs = playerArt.querySelectorAll('img');
   artIndex = 0;
 
-  if (CONFIG.audioUrl){
-    audio.src = CONFIG.audioUrl;
+  setupPlayerSource();
+
+  const letterSection = document.getElementById('letterSection');
+  const letterBody = (CONFIG.loveLetter || '').trim();
+  if (letterBody){
+    letterSection.style.display = '';
+    document.getElementById('letterModalTitle').textContent = CONFIG.loveLetterTitle || 'Uma cartinha para você';
+    document.getElementById('letterModalBody').textContent = letterBody;
+  } else {
+    letterSection.style.display = 'none';
   }
+
+  initScrollReveal();
 }
 
 /* ====================== Countdown ====================== */
@@ -371,7 +569,7 @@ const bars = () => document.querySelectorAll('#viewerBars .fill');
 function openViewer(i){
   currentStory = i;
   viewer.classList.add('open');
-  audio.pause();
+  playerPause();
   updatePlayIcon();
   renderStory();
 }
@@ -433,36 +631,127 @@ function fmt(t){
   const s = Math.floor(t % 60).toString().padStart(2, '0');
   return `${m}:${s}`;
 }
+
+/* ---- Fonte do áudio: mp3 (Cloudinary) ou link do YouTube (só áudio) ---- */
+let usingYouTube = false;
+let ytPlayer = null;
+let ytReady = false;
+let ytPollTimer = null;
+
+function extractYouTubeId(url){
+  if (!url) return null;
+  const m = String(url).match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+function loadYouTubeAPI(){
+  return new Promise((resolve) => {
+    if (window.YT && window.YT.Player){ resolve(); return; }
+    const prevReady = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => { if (prevReady) prevReady(); resolve(); };
+    if (!document.getElementById('ytApiScript')){
+      const tag = document.createElement('script');
+      tag.id = 'ytApiScript';
+      tag.src = 'https://www.youtube.com/iframe_api';
+      document.head.appendChild(tag);
+    }
+  });
+}
+async function setupYouTube(videoId){
+  await loadYouTubeAPI();
+  return new Promise((resolve) => {
+    ytPlayer = new YT.Player('ytPlayerHost', {
+      height: '1', width: '1', videoId,
+      playerVars: { controls:0, disablekb:1, fs:0, modestbranding:1, iv_load_policy:3, playsinline:1, rel:0 },
+      events: {
+        onReady: () => {
+          ytReady = true;
+          durTime.textContent = fmt(ytPlayer.getDuration());
+          resolve();
+        },
+        onStateChange: () => updatePlayIcon()
+      }
+    });
+  });
+}
+function setupPlayerSource(){
+  clearInterval(ytPollTimer);
+  const videoId = extractYouTubeId(CONFIG.youtubeUrl);
+  if (videoId){
+    usingYouTube = true;
+    ytReady = false;
+    setupYouTube(videoId).then(() => {
+      ytPollTimer = setInterval(() => {
+        if (!ytReady || !ytPlayer || typeof ytPlayer.getCurrentTime !== 'function') return;
+        const dur = ytPlayer.getDuration();
+        if (dur){
+          progressFill.style.width = (ytPlayer.getCurrentTime() / dur * 100) + '%';
+          curTime.textContent = fmt(ytPlayer.getCurrentTime());
+          durTime.textContent = fmt(dur);
+        }
+      }, 500);
+    });
+  } else {
+    usingYouTube = false;
+    if (CONFIG.audioUrl) audio.src = CONFIG.audioUrl;
+  }
+}
+function playerPlay(){
+  if (usingYouTube){ if (ytReady) ytPlayer.playVideo(); }
+  else if (audio.src) audio.play().catch(()=>{});
+}
+function playerPause(){
+  if (usingYouTube){ if (ytReady) ytPlayer.pauseVideo(); }
+  else audio.pause();
+}
+function playerIsPaused(){
+  if (usingYouTube) return !ytReady || !ytPlayer.getPlayerState || ytPlayer.getPlayerState() !== 1;
+  return audio.paused;
+}
+function playerSeek(ratio){
+  if (usingYouTube){
+    if (!ytReady) return;
+    const dur = ytPlayer.getDuration();
+    if (dur) ytPlayer.seekTo(ratio * dur, true);
+  } else if (audio.duration){
+    audio.currentTime = ratio * audio.duration;
+  }
+}
+function playerRestart(){
+  if (usingYouTube){ if (ytReady) ytPlayer.seekTo(0, true); }
+  else audio.currentTime = 0;
+}
+
 function updatePlayIcon(){
-  playIcon.innerHTML = audio.paused
+  playIcon.innerHTML = playerIsPaused()
     ? '<path d="M8 5v14l11-7z"/>'
     : '<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>';
 }
 playBtn.addEventListener('click', () => {
-  if (!audio.src) return;
-  if (audio.paused){ audio.play().catch(()=>{}); } else { audio.pause(); }
-  updatePlayIcon();
+  if (playerIsPaused()) playerPlay(); else playerPause();
+  setTimeout(updatePlayIcon, 60);
 });
 audio.addEventListener('timeupdate', () => {
-  if (audio.duration){
-    progressFill.style.width = (audio.currentTime / audio.duration * 100) + '%';
-    curTime.textContent = fmt(audio.currentTime);
-    durTime.textContent = fmt(audio.duration);
-  }
+  if (usingYouTube || !audio.duration) return;
+  progressFill.style.width = (audio.currentTime / audio.duration * 100) + '%';
+  curTime.textContent = fmt(audio.currentTime);
+  durTime.textContent = fmt(audio.duration);
 });
+audio.addEventListener('play', updatePlayIcon);
+audio.addEventListener('pause', updatePlayIcon);
 progressBar.addEventListener('click', (e) => {
   const rect = progressBar.getBoundingClientRect();
   const ratio = (e.clientX - rect.left) / rect.width;
-  if (audio.duration) audio.currentTime = ratio * audio.duration;
+  playerSeek(ratio);
 });
-document.getElementById('nextBtn').addEventListener('click', () => { audio.currentTime = 0; });
-document.getElementById('prevBtn').addEventListener('click', () => { audio.currentTime = 0; });
+document.getElementById('nextBtn').addEventListener('click', playerRestart);
+document.getElementById('prevBtn').addEventListener('click', playerRestart);
 
 /* ====================== Entry / reveal ====================== */
 document.getElementById('openBtn').addEventListener('click', () => {
   document.getElementById('entry').classList.add('hidden');
   document.getElementById('main').classList.add('show');
-  if (audio.src) audio.play().catch(()=>{});
+  burstConfetti();
+  playerPlay();
   updatePlayIcon();
 });
 
