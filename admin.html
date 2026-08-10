@@ -35,7 +35,6 @@
   .story-block:first-child{border-top:none; padding-top:0; margin-top:0;}
   .thumb-row{display:flex; align-items:center; gap:10px; margin-top:8px;}
   .thumb{width:44px; height:44px; border-radius:50%; object-fit:cover; background:rgba(255,255,255,0.08);}
-  .player-pick{display:flex; align-items:center; gap:8px; font-size:12px; margin-top:8px;}
   button{
     font-family:'Space Grotesk', sans-serif; font-weight:600; cursor:pointer; border:none; border-radius:999px;
   }
@@ -147,13 +146,9 @@
   </div>
 
   <div class="card">
-    <h2>Galeria (stories)</h2>
-    <div id="storiesWrap"></div>
-  </div>
-
-  <div class="card">
-    <h2>Fotos do player (escolha até 3)</h2>
-    <div id="playerPickWrap"></div>
+    <h2>Fotos do player (até 3)</h2>
+    <p class="field-hint" style="margin:0 0 12px;">Essas fotos alternam no quadrado da trilha sonora.</p>
+    <div id="playerPhotosWrap"></div>
   </div>
 
   <button class="save-btn" id="saveBtn">Salvar alterações</button>
@@ -207,14 +202,6 @@ const DEFAULT_CONFIG = {
   youtubeUrl: "",
   loveLetterTitle: "Uma cartinha para você",
   loveLetter: "",
-  stories: [
-    { name: "1º encontro", caption: "Onde tudo começou", imageUrl: "" },
-    { name: "Primeira viagem", caption: "Nossa primeira viagem juntos", imageUrl: "" },
-    { name: "Dia especial", caption: "Um dia que não esqueço", imageUrl: "" },
-    { name: "Risadas", caption: "Sempre rindo com você", imageUrl: "" },
-    { name: "Aniversário", caption: "Comemorando mais um ano", imageUrl: "" },
-    { name: "Hoje", caption: "E hoje, ainda apaixonado", imageUrl: "" }
-  ],
   playerPhotoUrls: []
 };
 
@@ -322,62 +309,6 @@ function fillForm(){
     document.getElementById('audioStatus').textContent = "áudio atual salvo ✓ (envie outro arquivo para substituir)";
   }
 
-  const storiesWrap = document.getElementById('storiesWrap');
-  storiesWrap.innerHTML = "";
-  CONFIG.stories.forEach((s, i) => {
-    const block = document.createElement('div');
-    block.className = 'story-block';
-    block.innerHTML = `
-      <label>Legenda curta (story ${i+1})</label>
-      <input type="text" data-field="name" data-i="${i}" value="${escapeHtml(s.name)}">
-      <label>Legenda na tela cheia</label>
-      <input type="text" data-field="caption" data-i="${i}" value="${escapeHtml(s.caption)}">
-      <label>Foto</label>
-      <div class="thumb-row">
-        <img class="thumb" data-thumb="${i}" src="${s.imageUrl || ''}" onerror="this.style.opacity=0">
-        <input type="file" accept="image/*" data-upload="${i}">
-        <button type="button" class="del-photo-btn" data-remove="${i}" style="${s.imageUrl ? '' : 'display:none;'}">Remover</button>
-      </div>`;
-    storiesWrap.appendChild(block);
-  });
-  storiesWrap.querySelectorAll('input[data-field]').forEach(el => {
-    el.addEventListener('input', () => {
-      CONFIG.stories[el.dataset.i][el.dataset.field] = el.value;
-      if (el.dataset.field === 'name') renderPlayerPicks();
-    });
-  });
-  storiesWrap.querySelectorAll('input[type=file][data-upload]').forEach(el => {
-    el.addEventListener('change', async () => {
-      const i = el.dataset.upload;
-      const file = el.files[0];
-      if (!file) return;
-      setStatus('Enviando foto...', '');
-      try{
-        const url = await uploadToCloudinary(file, IMAGE_UPLOAD_URL);
-        CONFIG.stories[i].imageUrl = url;
-        storiesWrap.querySelector(`img[data-thumb="${i}"]`).src = url;
-        storiesWrap.querySelector(`img[data-thumb="${i}"]`).style.opacity = 1;
-        storiesWrap.querySelector(`button[data-remove="${i}"]`).style.display = '';
-        renderPlayerPicks();
-        setStatus('Foto enviada ✓', 'ok');
-      }catch(e){ setStatus('Falha ao enviar a foto: ' + e.message, 'err'); }
-    });
-  });
-  storiesWrap.querySelectorAll('button[data-remove]').forEach(el => {
-    el.addEventListener('click', async () => {
-      const i = el.dataset.remove;
-      const ok = await confirmModal('Remover foto?', `Isso vai remover a foto do story "${CONFIG.stories[i].name || 'sem nome'}". Você pode enviar outra depois.`, 'Remover');
-      if (!ok) return;
-      CONFIG.stories[i].imageUrl = '';
-      const img = storiesWrap.querySelector(`img[data-thumb="${i}"]`);
-      img.src = '';
-      img.style.opacity = 0;
-      el.style.display = 'none';
-      renderPlayerPicks();
-      setStatus('Foto removida — clique em Salvar para confirmar.', 'ok');
-    });
-  });
-
   document.getElementById('audioFile').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -390,31 +321,56 @@ function fillForm(){
     }catch(e){ setStatus('Falha ao enviar a música: ' + e.message, 'err'); }
   });
 
-  renderPlayerPicks();
+  renderPlayerPhotos();
 }
 
-function renderPlayerPicks(){
-  const wrap = document.getElementById('playerPickWrap');
+function currentPlayerUrls(){
+  return (CONFIG.playerPhotoUrls || []).filter(Boolean);
+}
+
+function renderPlayerPhotos(){
+  const wrap = document.getElementById('playerPhotosWrap');
   wrap.innerHTML = "";
-  CONFIG.stories.forEach((s) => {
-    if (!s.imageUrl) return;
-    const id = 'pick-' + Math.random().toString(36).slice(2);
-    const row = document.createElement('label');
-    row.className = 'player-pick';
-    row.style.textTransform = 'none'; row.style.letterSpacing = 'normal'; row.style.opacity = '1';
-    const checked = CONFIG.playerPhotoUrls.includes(s.imageUrl) ? 'checked' : '';
-    row.innerHTML = `<input type="checkbox" id="${id}" value="${s.imageUrl}" ${checked}> <img class="thumb" style="width:28px;height:28px;" src="${s.imageUrl}"> ${escapeHtml(s.name)}`;
-    wrap.appendChild(row);
+  const urls = currentPlayerUrls();
+  for (let i = 0; i < 3; i++){
+    const url = urls[i] || "";
+    const block = document.createElement('div');
+    block.className = 'story-block';
+    block.innerHTML = `
+      <label>Foto ${i + 1}</label>
+      <div class="thumb-row">
+        <img class="thumb" data-thumb="${i}" src="${url}" style="${url ? '' : 'opacity:0;'}" onerror="this.style.opacity=0">
+        <input type="file" accept="image/*" data-upload="${i}">
+        <button type="button" class="del-photo-btn" data-remove="${i}" style="${url ? '' : 'display:none;'}">Remover</button>
+      </div>`;
+    wrap.appendChild(block);
+  }
+  wrap.querySelectorAll('input[type=file][data-upload]').forEach(el => {
+    el.addEventListener('change', async () => {
+      const i = Number(el.dataset.upload);
+      const file = el.files[0];
+      if (!file) return;
+      setStatus('Enviando foto...', '');
+      try{
+        const url = await uploadToCloudinary(file, IMAGE_UPLOAD_URL);
+        const urls = currentPlayerUrls();
+        urls[i] = url;
+        CONFIG.playerPhotoUrls = urls;
+        renderPlayerPhotos();
+        setStatus('Foto enviada ✓', 'ok');
+      }catch(e){ setStatus('Falha ao enviar a foto: ' + e.message, 'err'); }
+    });
   });
-  wrap.querySelectorAll('input[type=checkbox]').forEach(cb => {
-    cb.addEventListener('change', () => {
-      const checkedBoxes = [...wrap.querySelectorAll('input[type=checkbox]:checked')];
-      if (checkedBoxes.length > 3){
-        cb.checked = false;
-        setStatus('Escolha no máximo 3 fotos para o player.', 'err');
-        return;
-      }
-      CONFIG.playerPhotoUrls = checkedBoxes.map(b => b.value);
+  wrap.querySelectorAll('button[data-remove]').forEach(el => {
+    el.addEventListener('click', async () => {
+      const i = Number(el.dataset.remove);
+      const ok = await confirmModal('Remover foto?', 'Isso vai remover essa foto do player.', 'Remover');
+      if (!ok) return;
+      const urls = currentPlayerUrls();
+      urls.splice(i, 1);
+      CONFIG.playerPhotoUrls = urls;
+      renderPlayerPhotos();
+      setStatus('Foto removida — clique em Salvar para confirmar.', 'ok');
     });
   });
 }
