@@ -158,7 +158,8 @@
   }
 
   /* ====================== Corações flutuantes (fundo) ====================== */
-  #heartsBg{position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:1;}
+  #heartsBg{position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:-1;}
+  .page-hearts{position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:-1;}
   .floaty{
     position:absolute; bottom:-40px; color:var(--rose); opacity:0;
     animation:floatUp linear forwards; will-change:transform, opacity;
@@ -464,6 +465,7 @@
 </div>
 
 <div class="gallery-page" id="galleryPage">
+  <div class="page-hearts" id="galleryPageHearts"></div>
   <button class="letter-page-back" id="galleryBack" aria-label="Voltar">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 4.5 8 12l7.5 7.5 1.4-1.4L10.8 12l6.1-6.1z"/></svg>
     Voltar
@@ -485,6 +487,7 @@
 </div>
 
 <div class="hangman-page" id="hangmanPage">
+  <div class="page-hearts" id="hangmanPageHearts"></div>
   <button class="letter-page-back" id="hangmanBack" aria-label="Voltar">
     <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 4.5 8 12l7.5 7.5 1.4-1.4L10.8 12l6.1-6.1z"/></svg>
     Voltar
@@ -584,8 +587,21 @@ function placeholderFallback(el, iconSize){
 /* ====================== Corações flutuantes ====================== */
 const heartsBg = document.getElementById('heartsBg');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function activeHeartsContainer(){
+  const hangman = document.getElementById('hangmanPage');
+  if (hangman && hangman.classList.contains('open')) return document.getElementById('hangmanPageHearts');
+  const gallery = document.getElementById('galleryPage');
+  if (gallery && gallery.classList.contains('open')) return document.getElementById('galleryPageHearts');
+  const letter = document.getElementById('letterPage');
+  if (letter && letter.classList.contains('open')) return document.getElementById('letterPageHearts');
+  return heartsBg;
+}
+
 function spawnFloatyHeart(){
   if (reduceMotion) return;
+  const container = activeHeartsContainer();
+  if (!container) return;
   const el = document.createElement('div');
   el.className = 'floaty';
   el.textContent = Math.random() < 0.5 ? '♥' : '✦';
@@ -599,7 +615,7 @@ function spawnFloatyHeart(){
   el.style.animationDuration = duration + 's';
   el.style.setProperty('--drift', drift);
   el.style.setProperty('--spin', spin);
-  heartsBg.appendChild(el);
+  container.appendChild(el);
   setTimeout(() => el.remove(), duration * 1000 + 200);
 }
 setInterval(spawnFloatyHeart, 1400);
@@ -653,29 +669,8 @@ function initScrollReveal(){
 
 /* ====================== Carta surpresa (página cheia) ====================== */
 const letterPage = document.getElementById('letterPage');
-const letterPageHearts = document.getElementById('letterPageHearts');
-let letterHeartsSpawned = false;
-
-function spawnLetterHearts(){
-  if (letterHeartsSpawned) return;
-  letterHeartsSpawned = true;
-  const glyphs = ['♥','♡'];
-  for (let i = 0; i < 16; i++){
-    const el = document.createElement('span');
-    el.className = 'floaty';
-    el.textContent = glyphs[Math.floor(Math.random() * glyphs.length)];
-    el.style.left = Math.random() * 100 + '%';
-    el.style.fontSize = (12 + Math.random() * 16) + 'px';
-    el.style.animationDuration = (10 + Math.random() * 10) + 's';
-    el.style.animationDelay = (Math.random() * 10) + 's';
-    el.style.setProperty('--drift', (Math.random() * 60 - 30) + 'px');
-    el.style.setProperty('--spin', (Math.random() * 40 - 20) + 'deg');
-    letterPageHearts.appendChild(el);
-  }
-}
 
 function openLetterPage(){
-  spawnLetterHearts();
   letterPage.classList.add('open');
   document.body.style.overflow = 'hidden';
   // a música de fundo continua tocando normalmente
