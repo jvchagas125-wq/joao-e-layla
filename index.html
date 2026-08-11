@@ -542,6 +542,7 @@ const DEFAULT_CONFIG = {
   loveLetter: "",
   playerPhotoUrls: [],
   gallery: [],
+  hangmanClue: "",
   hangmanWord: "Princesa",
   hangmanWinMessage: "Deus e Nossa Senhora mandou muito para mim uma princesa, uma que nem a Disney tem, te amo muito! 🥰❤️",
   crossword: [
@@ -705,6 +706,8 @@ function paintGallerySlide(){
   document.getElementById('galleryMessage').textContent = item.message || '';
   galleryDots.querySelectorAll('span').forEach((dot, i) => dot.classList.toggle('active', i === galleryIndex));
   document.getElementById('galleryCounter').textContent = `${galleryIndex + 1} / ${galleryItems.length}`;
+  const isLast = galleryIndex === galleryItems.length - 1;
+  document.getElementById('hangmanBtn').style.display = isLast ? '' : 'none';
 }
 
 function buildGalleryDots(){
@@ -1051,7 +1054,7 @@ buildHangmanKeyboard();
 
 function hmLoadItems(){
   const first = {
-    clue: '',
+    clue: CONFIG.hangmanClue || DEFAULT_CONFIG.hangmanClue || '',
     answer: CONFIG.hangmanWord || DEFAULT_CONFIG.hangmanWord,
     message: CONFIG.hangmanWinMessage || DEFAULT_CONFIG.hangmanWinMessage
   };
