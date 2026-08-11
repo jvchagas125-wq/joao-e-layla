@@ -262,6 +262,57 @@
   .letter-page-sign{display:block; margin-top:24px; font-size:11px; opacity:0.5; font-style:normal; letter-spacing:0.08em; text-transform:uppercase;}
   .gallery-open-btn{margin-top:28px;}
 
+  /* ====================== Página final (jogo concluído) ====================== */
+  .final-page{
+    position:fixed; inset:0; z-index:99; overflow-y:auto;
+    background:
+      radial-gradient(ellipse 90% 55% at 50% -10%, rgba(244,184,199,0.2), transparent),
+      radial-gradient(ellipse 70% 45% at 100% 100%, rgba(217,169,92,0.18), transparent),
+      linear-gradient(180deg, var(--night) 0%, var(--ink) 100%);
+    opacity:0; visibility:hidden; pointer-events:none;
+    transform:scale(0.92);
+    transition:opacity 0.8s cubic-bezier(.22,.9,.24,1), transform 0.8s cubic-bezier(.22,.9,.24,1), visibility 0.8s;
+  }
+  .final-page.open{opacity:1; visibility:visible; pointer-events:auto; transform:scale(1);}
+  .final-page-scroll{
+    min-height:100%; display:flex; align-items:center; justify-content:center;
+    padding:70px 22px; position:relative; z-index:1;
+  }
+  .final-page-card{
+    max-width:420px; width:100%;
+    background:linear-gradient(165deg, #2a1626, #1c0f1f); border:1px solid rgba(217,169,92,0.3);
+    border-radius:24px; padding:44px 30px; text-align:center;
+    box-shadow:0 30px 80px rgba(0,0,0,0.6), 0 0 40px rgba(217,169,92,0.08);
+    opacity:0; transform:translateY(24px) scale(0.96);
+    transition:opacity 0.8s ease 0.2s, transform 0.8s cubic-bezier(.22,.9,.24,1) 0.2s;
+  }
+  .final-page.open .final-page-card{opacity:1; transform:translateY(0) scale(1);}
+  .final-page-ring{
+    font-size:40px; margin-bottom:18px;
+    animation:pulse 2.4s ease-in-out infinite, ringSpin 6s ease-in-out infinite;
+    display:inline-block;
+  }
+  @keyframes ringSpin{0%,100%{transform:rotate(-8deg);} 50%{transform:rotate(8deg);}}
+  .final-page-title{
+    font-family:'Fraunces', serif; font-style:italic; font-weight:500; font-size:24px;
+    margin:0 0 18px; color:var(--rose); line-height:1.4;
+    animation:glowPulse 3.2s ease-in-out infinite;
+  }
+  .final-page-divider{width:52px; height:1px; margin:0 auto 24px; background:linear-gradient(90deg, transparent, var(--gold), transparent);}
+  .final-page-text{
+    font-size:15px; line-height:1.9; opacity:0; margin:0;
+    transform:translateY(10px);
+    transition:opacity 0.8s ease 0.6s, transform 0.8s ease 0.6s;
+  }
+  .final-page.open .final-page-text{opacity:0.92; transform:translateY(0);}
+  .final-page-continues{
+    margin:30px 0 0; font-family:'Fraunces', serif; font-style:italic; font-size:13px;
+    letter-spacing:0.16em; text-transform:uppercase; color:var(--gold);
+    opacity:0; transform:translateY(8px);
+    transition:opacity 1s ease 1.4s, transform 1s ease 1.4s;
+  }
+  .final-page.open .final-page-continues{opacity:0.75; transform:translateY(0);}
+
   /* ====================== Galeria (álbum com efeito de virar página) ====================== */
   .gallery-page{
     position:fixed; inset:0; z-index:95; overflow-y:auto;
@@ -365,6 +416,7 @@
   .cw-clue{max-width:380px; text-align:center; font-family:'Fraunces', serif; font-style:italic; font-size:15.5px; line-height:1.7; opacity:0.92; margin:0 0 20px;}
   .cw-final{margin-top:22px; text-align:center; font-family:'Fraunces', serif; font-style:italic; font-size:14px; opacity:0; transform:translateY(10px); transition:opacity 0.6s ease, transform 0.6s ease;}
   .cw-final.show{opacity:0.75; transform:translateY(0);}
+  .hangman-open-btn.cw-final.show{opacity:1;}
 </style>
 </head>
 <body>
@@ -504,7 +556,20 @@
   <div class="hm-keyboard" id="hmKeyboard"></div>
   <div class="hm-status" id="hmStatus"><span class="hm-status-heart">♥</span><span id="hmStatusText"></span></div>
   <button class="letter-btn hangman-open-btn" id="hmNextBtn" style="display:none;">Próxima palavra🤭</button>
-  <p class="cw-final" id="hmFinal">Você descobriu todas as palavras! 💕</p>
+  <button class="letter-btn hangman-open-btn cw-final" id="hmFinalBtn" style="display:none;">Finalizar 💍</button>
+</div>
+
+<div class="final-page" id="finalPage">
+  <div class="page-hearts" id="finalPageHearts"></div>
+  <div class="final-page-scroll">
+    <div class="final-page-card">
+      <div class="final-page-ring">💍</div>
+      <h2 class="final-page-title">Parabéns! Você descobriu<br>todas as palavras! 💕</h2>
+      <div class="final-page-divider"></div>
+      <p class="final-page-text">Obrigado por tudo meu amor eu te amo muitoooo!! Fiz isso aqui para você com muito amor e carinho!<br><br>Agora o próximo nível será em alguns anos... 💍🥹</p>
+      <p class="final-page-continues">Continua...</p>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -589,6 +654,8 @@ const heartsBg = document.getElementById('heartsBg');
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 function activeHeartsContainer(){
+  const final = document.getElementById('finalPage');
+  if (final && final.classList.contains('open')) return document.getElementById('finalPageHearts');
   const hangman = document.getElementById('hangmanPage');
   if (hangman && hangman.classList.contains('open')) return document.getElementById('hangmanPageHearts');
   const gallery = document.getElementById('galleryPage');
@@ -1018,7 +1085,7 @@ const hmHeartsEl = document.getElementById('hmHearts');
 const hmClueEl = document.getElementById('hmClue');
 const hmStatusEl = document.getElementById('hmStatus');
 const hmStatusText = document.getElementById('hmStatusText');
-const hmFinalEl = document.getElementById('hmFinal');
+const hmFinalBtn = document.getElementById('hmFinalBtn');
 const hmNextBtn = document.getElementById('hmNextBtn');
 const HM_MAX_WRONG = 6;
 const HM_KEYS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÇÁÉÍÓÚÃÕÂÊÔ'.split('');
@@ -1060,7 +1127,8 @@ function hmLoadItems(){
 function hmInit(){
   hmLoadItems();
   hmIndex = 0;
-  hmFinalEl.classList.remove('show');
+  hmFinalBtn.style.display = 'none';
+  hmFinalBtn.classList.remove('show');
   if (hmItems.length) hmStartWord();
 }
 
@@ -1082,7 +1150,8 @@ function hmStartWord(){
   hmStatusEl.classList.remove('show', 'lost');
   hmWordEl.classList.remove('shake');
   hmNextBtn.style.display = 'none';
-  hmFinalEl.classList.remove('show');
+  hmFinalBtn.style.display = 'none';
+  hmFinalBtn.classList.remove('show');
   hmRender();
 }
 
@@ -1131,7 +1200,8 @@ function hmCheckState(){
     if (hmIndex < hmItems.length - 1){
       hmNextBtn.style.display = '';
     } else {
-      requestAnimationFrame(() => hmFinalEl.classList.add('show'));
+      hmFinalBtn.style.display = '';
+      requestAnimationFrame(() => hmFinalBtn.classList.add('show'));
     }
   } else if (hmWrong >= HM_MAX_WRONG){
     hmLocked = true;
@@ -1160,6 +1230,14 @@ hmNextBtn.addEventListener('click', () => {
   hmIndex++;
   hmStartWord();
 });
+
+const finalPage = document.getElementById('finalPage');
+function openFinalPage(){
+  hangmanPage.classList.remove('open');
+  finalPage.classList.add('open');
+  setTimeout(burstConfetti, 350);
+}
+hmFinalBtn.addEventListener('click', openFinalPage);
 
 function openHangmanPage(){
   hmInit();
