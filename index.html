@@ -359,6 +359,19 @@
   .hm-status.lost .hm-status-heart{animation:none; opacity:0.6;}
   @keyframes hmShake{0%,100%{transform:translateX(0);} 20%{transform:translateX(-8px);} 40%{transform:translateX(7px);} 60%{transform:translateX(-5px);} 80%{transform:translateX(4px);}}
   .hm-word.shake{animation:hmShake 0.5s ease;}
+
+  /* ====================== Palavras cruzadas ====================== */
+  .cw-clue{max-width:380px; text-align:center; font-family:'Fraunces', serif; font-style:italic; font-size:15.5px; line-height:1.7; opacity:0.92; margin:0 0 24px;}
+  .cw-controls{display:flex; gap:10px; margin-top:18px;}
+  .cw-ctrl-btn{
+    padding:10px 22px; border-radius:999px; font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:12.5px;
+    cursor:pointer; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.06); color:var(--cream);
+    transition:transform 0.15s ease, opacity 0.2s ease;
+  }
+  .cw-ctrl-btn:active{transform:scale(0.94);}
+  .cw-ctrl-btn:disabled{opacity:0.3; cursor:default;}
+  .cw-final{margin-top:22px; text-align:center; font-family:'Fraunces', serif; font-style:italic; font-size:14px; opacity:0; transform:translateY(10px); transition:opacity 0.6s ease, transform 0.6s ease;}
+  .cw-final.show{opacity:0.75; transform:translateY(0);}
 </style>
 </head>
 <body>
@@ -494,6 +507,29 @@
   <div class="hm-word" id="hmWordEl"></div>
   <div class="hm-keyboard" id="hmKeyboard"></div>
   <div class="hm-status" id="hmStatus"><span class="hm-status-heart">♥</span><span id="hmStatusText"></span></div>
+  <button class="letter-btn hangman-open-btn" id="hmContinueBtn" style="display:none;">Continuar game🤭</button>
+</div>
+
+<div class="hangman-page" id="crosswordPage" style="z-index:99;">
+  <button class="letter-page-back" id="crosswordBack" aria-label="Voltar">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 4.5 8 12l7.5 7.5 1.4-1.4L10.8 12l6.1-6.1z"/></svg>
+    Voltar
+  </button>
+  <button class="hangman-restart-btn" id="crosswordRestartBtn" aria-label="Reiniciar">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 7l5 5V8c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+    Reiniciar
+  </button>
+  <h2 class="hangman-title">Palavras cruzadas</h2>
+  <p class="hangman-sub" id="cwCounter">1 / 1</p>
+  <p class="cw-clue" id="cwClue"></p>
+  <div class="hm-word" id="cwWordEl"></div>
+  <div class="hm-keyboard" id="cwKeyboard"></div>
+  <div class="cw-controls">
+    <button type="button" class="cw-ctrl-btn" id="cwBackspaceBtn">⌫ Apagar</button>
+  </div>
+  <div class="hm-status" id="cwStatus"><span class="hm-status-heart">♥</span><span id="cwStatusText"></span></div>
+  <button class="letter-btn hangman-open-btn" id="cwNextBtn" style="display:none;">Próxima palavra ›</button>
+  <p class="cw-final" id="cwFinal">Você descobriu todas as palavras! 💕</p>
 </div>
 
 <script>
@@ -535,7 +571,17 @@ const DEFAULT_CONFIG = {
   playerPhotoUrls: [],
   gallery: [],
   hangmanWord: "Princesa",
-  hangmanWinMessage: "Deus e Nossa Senhora mandou muito para mim uma princesa, uma que nem a Disney tem, te amo muito! 🥰❤️"
+  hangmanWinMessage: "Deus e Nossa Senhora mandou muito para mim uma princesa, uma que nem a Disney tem, te amo muito! 🥰❤️",
+  crossword: [
+    { clue: "Uma coisa que eu gosto de fazer muito para te vê feliz...", answer: "MIMAR", message: "Eu fico tão feliz quando eu mimo você porque fica tão fofa e feliz!🤭" },
+    { clue: "Eu amo o seu...", answer: "BEIJO", message: "O seu beijo é umas das melhores coisas que existe no mundo!🤤❤️" },
+    { clue: "Amo apertar...", answer: "PERNAS", message: "Essas pernas me deixam doido meu Deus do céu, muito fofo, vontade de apertar sempre! 😍" },
+    { clue: "Gosto de chamar...", answer: "BOTINHO", message: "Esse apelido combinou muito com você, acho tão fofo! 🤭❤️" },
+    { clue: "Uma das coisas que eu gosto de fazer com você...", answer: "REZAR", message: "Sinto que conquistamos mais coisas no nosso futuro quando rezamos juntos! ❤️🙏" },
+    { clue: "Uma das coisas que eu gosto quando você faz em mim...", answer: "CAFUNÉ", message: "Uma das coisas que eu passei a amar depois que eu te conheci foi o cafuné que você faz em mim, é algo mágico, seu carinho é maravilhoso! ❤️" },
+    { clue: "Uma coisa que eu faço que te deixa sem graça...", answer: "OLHAR", message: "Eu amo tanto ficar te olhando, contemplando e só pensando o quanto eu te amo mas é engraçado quando você fica sem graça 🤣❤️" },
+    { clue: "Uma das coisas que eu gosto quando você quer ser romântica...", answer: "PALAVRAS", message: "Quando você fala que me ama, que está saudades, está com saudades do meu abraço, do meu beijo, de mim! Quando faz cartas com do seu jeito com as palavras bonitas e textos enormes eu me emociono demais, é uma das coisas que eu mais fico feliz quando você faz!🥹❤️" }
+  ]
 };
 
 let CONFIG = DEFAULT_CONFIG;
@@ -1035,6 +1081,7 @@ function hmInit(){
   hmLost = false;
   hmStatusEl.classList.remove('show', 'lost');
   hmWordEl.classList.remove('shake');
+  document.getElementById('hmContinueBtn').style.display = 'none';
   hmRender();
 }
 
@@ -1083,6 +1130,7 @@ function hmCheckState(){
     hmStatusText.textContent = CONFIG.hangmanWinMessage || DEFAULT_CONFIG.hangmanWinMessage;
     hmStatusEl.classList.remove('lost');
     requestAnimationFrame(() => hmStatusEl.classList.add('show'));
+    document.getElementById('hmContinueBtn').style.display = '';
   } else if (hmWrong >= HM_MAX_WRONG){
     hmLost = true;
     hmRender();
@@ -1120,8 +1168,153 @@ document.addEventListener('keydown', (e) => {
   if (hangmanPage.classList.contains('open')){
     if (e.key === 'Escape') closeHangmanPage();
     else if (/^[a-zA-ZçÇáÁéÉíÍóÓúÚãÃõÕâÂêÊôÔ]$/.test(e.key)) hmGuess(e.key);
+  } else if (crosswordPage.classList.contains('open')){
+    if (e.key === 'Escape') closeCrosswordPage();
+    else if (e.key === 'Backspace') cwBackspace();
+    else if (/^[a-zA-ZçÇáÁéÉíÍóÓúÚãÃõÕâÂêÊôÔ]$/.test(e.key)) cwType(e.key);
   }
 });
+
+/* ====================== Palavras cruzadas ====================== */
+const crosswordPage = document.getElementById('crosswordPage');
+const cwWordEl = document.getElementById('cwWordEl');
+const cwStatusEl = document.getElementById('cwStatus');
+const cwStatusText = document.getElementById('cwStatusText');
+const cwFinalEl = document.getElementById('cwFinal');
+const cwNextBtn = document.getElementById('cwNextBtn');
+
+let cwItems = [];
+let cwIndex = 0;
+let cwAnswer = '';
+let cwEntered = [];
+
+function buildCrosswordKeyboard(){
+  const kb = document.getElementById('cwKeyboard');
+  kb.innerHTML = '';
+  HM_KEYS.forEach(ch => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'hm-key';
+    btn.textContent = ch;
+    btn.dataset.letter = ch;
+    btn.addEventListener('click', () => cwType(ch));
+    kb.appendChild(btn);
+  });
+}
+buildCrosswordKeyboard();
+
+function cwLoadItems(){
+  const source = (CONFIG.crossword && CONFIG.crossword.length) ? CONFIG.crossword : DEFAULT_CONFIG.crossword;
+  cwItems = source.filter(it => it && (it.answer || '').trim());
+}
+
+function cwInit(){
+  cwLoadItems();
+  cwIndex = 0;
+  cwFinalEl.classList.remove('show');
+  if (cwItems.length) cwStartWord();
+}
+
+function cwStartWord(){
+  const item = cwItems[cwIndex];
+  cwAnswer = (item.answer || '').trim().toUpperCase();
+  cwEntered = [];
+  document.getElementById('cwClue').textContent = item.clue || '';
+  document.getElementById('cwCounter').textContent = `${cwIndex + 1} / ${cwItems.length}`;
+  cwStatusEl.classList.remove('show');
+  cwNextBtn.style.display = 'none';
+  cwFinalEl.classList.remove('show');
+  cwSetControlsEnabled(true);
+  cwRenderWord();
+}
+
+function cwRenderWord(){
+  cwWordEl.innerHTML = '';
+  [...cwAnswer].forEach((ch, i) => {
+    const tile = document.createElement('span');
+    tile.className = 'hm-tile';
+    if (ch === ' '){
+      tile.classList.add('space');
+    } else if (cwEntered[i]){
+      tile.textContent = cwEntered[i];
+      tile.classList.add('revealed');
+    }
+    cwWordEl.appendChild(tile);
+  });
+}
+
+function cwSetControlsEnabled(enabled){
+  document.querySelectorAll('#cwKeyboard .hm-key').forEach(btn => { btn.disabled = !enabled; });
+  document.getElementById('cwBackspaceBtn').disabled = !enabled;
+}
+
+function cwNextEmptyIndex(){
+  for (let i = 0; i < cwAnswer.length; i++){
+    if (cwAnswer[i] !== ' ' && !cwEntered[i]) return i;
+  }
+  return -1;
+}
+
+function cwType(rawCh){
+  const ch = hmNormalize(rawCh);
+  if (!HM_KEYS.includes(ch)) return;
+  const idx = cwNextEmptyIndex();
+  if (idx === -1) return;
+  cwEntered[idx] = ch;
+  cwRenderWord();
+  if (cwNextEmptyIndex() === -1) cwCheck();
+}
+
+function cwBackspace(){
+  for (let i = cwAnswer.length - 1; i >= 0; i--){
+    if (cwAnswer[i] !== ' ' && cwEntered[i]){ cwEntered[i] = null; break; }
+  }
+  cwRenderWord();
+}
+
+function cwCheck(){
+  const guess = [...cwAnswer].map((ch, i) => ch === ' ' ? ' ' : (cwEntered[i] || '')).join('');
+  if (guess === cwAnswer){
+    cwSetControlsEnabled(false);
+    burstConfetti();
+    cwStatusText.textContent = cwItems[cwIndex].message || '';
+    cwStatusEl.classList.add('show');
+    if (cwIndex < cwItems.length - 1){
+      cwNextBtn.style.display = '';
+    } else {
+      requestAnimationFrame(() => cwFinalEl.classList.add('show'));
+    }
+  } else {
+    cwWordEl.classList.add('shake');
+    setTimeout(() => {
+      cwEntered = [];
+      cwWordEl.classList.remove('shake');
+      cwRenderWord();
+    }, 480);
+  }
+}
+
+cwNextBtn.addEventListener('click', () => {
+  cwIndex++;
+  cwStartWord();
+});
+document.getElementById('cwBackspaceBtn').addEventListener('click', cwBackspace);
+
+function openCrosswordPage(){
+  cwInit();
+  crosswordPage.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeCrosswordPage(){
+  crosswordPage.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('hmContinueBtn').addEventListener('click', () => {
+  closeHangmanPage();
+  setTimeout(openCrosswordPage, 350);
+});
+document.getElementById('crosswordBack').addEventListener('click', closeCrosswordPage);
+document.getElementById('crosswordRestartBtn').addEventListener('click', cwInit);
 
 loadConfig();
 </script>
