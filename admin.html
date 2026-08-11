@@ -161,6 +161,8 @@
   <div class="card">
     <h2>Adivinhe a palavra — 1ª palavra</h2>
     <p class="field-hint" style="margin:0 0 12px;">Aparece um botão "Play Game ❤️🎮" no final da galeria de fotos, abrindo o jogo "Adivinhe a palavra". Essa é a primeira palavra do jogo.</p>
+    <label>Dica</label>
+    <input type="text" id="hangmanClue" placeholder="Ex: Eu amo o seu...">
     <label>Palavra secreta</label>
     <input type="text" id="hangmanWord" placeholder="Ex: Princesa">
     <p class="field-hint">Acentos são aceitos (ex: Coração). Evite números e símbolos.</p>
@@ -228,6 +230,7 @@ const DEFAULT_CONFIG = {
   loveLetter: "",
   playerPhotoUrls: [],
   gallery: [],
+  hangmanClue: "",
   hangmanWord: "Princesa",
   hangmanWinMessage: "Deus e Nossa Senhora mandou muito para mim uma princesa, uma que nem a Disney tem, te amo muito! 🥰❤️",
   crossword: [
@@ -342,6 +345,7 @@ function fillForm(){
   document.getElementById('youtubeUrl').value = CONFIG.youtubeUrl || '';
   document.getElementById('loveLetterTitle').value = CONFIG.loveLetterTitle || '';
   document.getElementById('loveLetter').value = CONFIG.loveLetter || '';
+  document.getElementById('hangmanClue').value = CONFIG.hangmanClue || DEFAULT_CONFIG.hangmanClue || '';
   document.getElementById('hangmanWord').value = CONFIG.hangmanWord || DEFAULT_CONFIG.hangmanWord;
   document.getElementById('hangmanWinMessage').value = CONFIG.hangmanWinMessage || DEFAULT_CONFIG.hangmanWinMessage;
   if (CONFIG.audioUrl){
@@ -586,6 +590,7 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   CONFIG.songTitle = document.getElementById('songTitle').value;
   CONFIG.songArtist = document.getElementById('songArtist').value;
   CONFIG.youtubeUrl = document.getElementById('youtubeUrl').value.trim();
+  CONFIG.hangmanClue = document.getElementById('hangmanClue').value.trim();
   CONFIG.hangmanWord = document.getElementById('hangmanWord').value.trim() || DEFAULT_CONFIG.hangmanWord;
   CONFIG.hangmanWinMessage = document.getElementById('hangmanWinMessage').value.trim() || DEFAULT_CONFIG.hangmanWinMessage;
 
