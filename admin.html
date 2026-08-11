@@ -158,6 +158,16 @@
     <button type="button" id="addGalleryBtn" style="margin-top:6px; padding:10px 18px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:var(--cream); font-size:13px;">+ Adicionar foto</button>
   </div>
 
+  <div class="card">
+    <h2>Jogo da forca</h2>
+    <p class="field-hint" style="margin:0 0 12px;">Aparece um botão "Play Game ❤️🎮" no final da galeria de fotos, abrindo o jogo da forca.</p>
+    <label>Palavra secreta</label>
+    <input type="text" id="hangmanWord" placeholder="Ex: Princesa">
+    <p class="field-hint">Acentos são aceitos (ex: Coração). Evite números e símbolos.</p>
+    <label>Mensagem ao acertar a palavra</label>
+    <textarea id="hangmanWinMessage" style="min-height:90px;" placeholder="Mensagem que aparece quando a palavra é descoberta..."></textarea>
+  </div>
+
   <button class="save-btn" id="saveBtn">Salvar alterações</button>
   <p class="status" id="statusMsg"></p>
 </div>
@@ -210,7 +220,9 @@ const DEFAULT_CONFIG = {
   loveLetterTitle: "Uma cartinha para você",
   loveLetter: "",
   playerPhotoUrls: [],
-  gallery: []
+  gallery: [],
+  hangmanWord: "Princesa",
+  hangmanWinMessage: "Deus e Nossa Senhora mandou muito para mim uma princesa, uma que nem a Disney tem, te amo muito! 🥰❤️"
 };
 
 let CONFIG = null;
@@ -313,6 +325,8 @@ function fillForm(){
   document.getElementById('youtubeUrl').value = CONFIG.youtubeUrl || '';
   document.getElementById('loveLetterTitle').value = CONFIG.loveLetterTitle || '';
   document.getElementById('loveLetter').value = CONFIG.loveLetter || '';
+  document.getElementById('hangmanWord').value = CONFIG.hangmanWord || DEFAULT_CONFIG.hangmanWord;
+  document.getElementById('hangmanWinMessage').value = CONFIG.hangmanWinMessage || DEFAULT_CONFIG.hangmanWinMessage;
   if (CONFIG.audioUrl){
     document.getElementById('audioStatus').textContent = "áudio atual salvo ✓ (envie outro arquivo para substituir)";
   }
@@ -493,6 +507,8 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   CONFIG.songTitle = document.getElementById('songTitle').value;
   CONFIG.songArtist = document.getElementById('songArtist').value;
   CONFIG.youtubeUrl = document.getElementById('youtubeUrl').value.trim();
+  CONFIG.hangmanWord = document.getElementById('hangmanWord').value.trim() || DEFAULT_CONFIG.hangmanWord;
+  CONFIG.hangmanWinMessage = document.getElementById('hangmanWinMessage').value.trim() || DEFAULT_CONFIG.hangmanWinMessage;
 
   const btn = document.getElementById('saveBtn');
   btn.disabled = true;
