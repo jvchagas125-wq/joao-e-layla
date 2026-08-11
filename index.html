@@ -494,32 +494,14 @@
     Reiniciar
   </button>
   <h2 class="hangman-title">Adivinhe a palavra</h2>
-  <p class="hangman-sub">jogo da forca</p>
+  <p class="hangman-sub" id="hmCounter">1 / 1</p>
+  <p class="cw-clue" id="hmClue" style="display:none;"></p>
   <div class="hm-hearts" id="hmHearts"></div>
   <div class="hm-word" id="hmWordEl"></div>
   <div class="hm-keyboard" id="hmKeyboard"></div>
   <div class="hm-status" id="hmStatus"><span class="hm-status-heart">♥</span><span id="hmStatusText"></span></div>
-  <button class="letter-btn hangman-open-btn" id="hmContinueBtn" style="display:none;">Continuar game🤭</button>
-</div>
-
-<div class="hangman-page" id="crosswordPage" style="z-index:99;">
-  <button class="letter-page-back" id="crosswordBack" aria-label="Voltar">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 4.5 8 12l7.5 7.5 1.4-1.4L10.8 12l6.1-6.1z"/></svg>
-    Voltar
-  </button>
-  <button class="hangman-restart-btn" id="crosswordRestartBtn" aria-label="Reiniciar">
-    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 7l5 5V8c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
-    Reiniciar
-  </button>
-  <h2 class="hangman-title">Palavras cruzadas</h2>
-  <p class="hangman-sub" id="cwCounter">1 / 1</p>
-  <p class="cw-clue" id="cwClue"></p>
-  <div class="hm-hearts" id="cwHearts"></div>
-  <div class="hm-word" id="cwWordEl"></div>
-  <div class="hm-keyboard" id="cwKeyboard"></div>
-  <div class="hm-status" id="cwStatus"><span class="hm-status-heart">♥</span><span id="cwStatusText"></span></div>
-  <button class="letter-btn hangman-open-btn" id="cwNextBtn" style="display:none;">Próxima palavra ›</button>
-  <p class="cw-final" id="cwFinal">Você descobriu todas as palavras! 💕</p>
+  <button class="letter-btn hangman-open-btn" id="hmNextBtn" style="display:none;">Próxima palavra🤭</button>
+  <p class="cw-final" id="hmFinal">Você descobriu todas as palavras! 💕</p>
 </div>
 
 <script>
@@ -1031,20 +1013,24 @@ function openEntry(){
 document.getElementById('openBtn').addEventListener('click', openEntry);
 document.getElementById('envelope').addEventListener('click', openEntry);
 
-/* ====================== Jogo da forca ====================== */
+/* ====================== Adivinhe a palavra (forca unificada) ====================== */
 const hangmanPage = document.getElementById('hangmanPage');
 const hmWordEl = document.getElementById('hmWordEl');
 const hmHeartsEl = document.getElementById('hmHearts');
+const hmClueEl = document.getElementById('hmClue');
 const hmStatusEl = document.getElementById('hmStatus');
 const hmStatusText = document.getElementById('hmStatusText');
+const hmFinalEl = document.getElementById('hmFinal');
+const hmNextBtn = document.getElementById('hmNextBtn');
 const HM_MAX_WRONG = 6;
 const HM_KEYS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZÇÁÉÍÓÚÃÕÂÊÔ'.split('');
 
+let hmItems = [];
+let hmIndex = 0;
 let hmWord = '';
 let hmGuessed = new Set();
 let hmWrong = 0;
-let hmWon = false;
-let hmLost = false;
+let hmLocked = false;
 
 function hmNormalize(ch){ return ch.toUpperCase(); }
 
@@ -1063,15 +1049,42 @@ function buildHangmanKeyboard(){
 }
 buildHangmanKeyboard();
 
+function hmLoadItems(){
+  const first = {
+    clue: '',
+    answer: CONFIG.hangmanWord || DEFAULT_CONFIG.hangmanWord,
+    message: CONFIG.hangmanWinMessage || DEFAULT_CONFIG.hangmanWinMessage
+  };
+  const rest = ((CONFIG.crossword && CONFIG.crossword.length) ? CONFIG.crossword : DEFAULT_CONFIG.crossword);
+  hmItems = [first, ...rest].filter(it => it && (it.answer || '').trim());
+}
+
 function hmInit(){
-  hmWord = (CONFIG.hangmanWord || DEFAULT_CONFIG.hangmanWord || 'Princesa').trim().toUpperCase();
+  hmLoadItems();
+  hmIndex = 0;
+  hmFinalEl.classList.remove('show');
+  if (hmItems.length) hmStartWord();
+}
+
+function hmStartWord(){
+  const item = hmItems[hmIndex];
+  hmWord = (item.answer || '').trim().toUpperCase();
   hmGuessed = new Set();
   hmWrong = 0;
-  hmWon = false;
-  hmLost = false;
+  hmLocked = false;
+
+  if (item.clue && item.clue.trim()){
+    hmClueEl.textContent = item.clue;
+    hmClueEl.style.display = '';
+  } else {
+    hmClueEl.textContent = '';
+    hmClueEl.style.display = 'none';
+  }
+  document.getElementById('hmCounter').textContent = `${hmIndex + 1} / ${hmItems.length}`;
   hmStatusEl.classList.remove('show', 'lost');
   hmWordEl.classList.remove('shake');
-  document.getElementById('hmContinueBtn').style.display = 'none';
+  hmNextBtn.style.display = 'none';
+  hmFinalEl.classList.remove('show');
   hmRender();
 }
 
@@ -1085,9 +1098,6 @@ function hmRender(){
     } else if (hmGuessed.has(ch)){
       tile.textContent = ch;
       tile.classList.add('revealed');
-    } else if (hmLost){
-      tile.textContent = ch;
-      tile.classList.add('revealed', 'missed');
     }
     hmWordEl.appendChild(tile);
   });
@@ -1104,7 +1114,7 @@ function hmRender(){
   document.querySelectorAll('.hm-key').forEach(btn => {
     const ch = btn.dataset.letter;
     const guessed = hmGuessed.has(ch);
-    btn.disabled = guessed || hmWon || hmLost;
+    btn.disabled = guessed || hmLocked;
     btn.classList.toggle('correct', guessed && hmWord.includes(ch));
     btn.classList.toggle('wrong', guessed && !hmWord.includes(ch));
   });
@@ -1114,25 +1124,32 @@ function hmCheckState(){
   const lettersOnly = [...hmWord].filter(c => c !== ' ');
   const allGuessed = lettersOnly.every(c => hmGuessed.has(c));
   if (allGuessed){
-    hmWon = true;
+    hmLocked = true;
     hmRender();
     burstConfetti();
-    hmStatusText.textContent = CONFIG.hangmanWinMessage || DEFAULT_CONFIG.hangmanWinMessage;
+    hmStatusText.textContent = hmItems[hmIndex].message || '';
     hmStatusEl.classList.remove('lost');
-    requestAnimationFrame(() => hmStatusEl.classList.add('show'));
-    document.getElementById('hmContinueBtn').style.display = '';
+    hmStatusEl.classList.add('show');
+    if (hmIndex < hmItems.length - 1){
+      hmNextBtn.style.display = '';
+    } else {
+      requestAnimationFrame(() => hmFinalEl.classList.add('show'));
+    }
   } else if (hmWrong >= HM_MAX_WRONG){
-    hmLost = true;
+    hmLocked = true;
     hmRender();
     hmWordEl.classList.add('shake');
-    hmStatusText.textContent = 'Quase lá... tente de novo! 💔';
-    hmStatusEl.classList.add('lost');
-    requestAnimationFrame(() => hmStatusEl.classList.add('show'));
+    hmStatusText.textContent = 'Você perdeu todos os corações... vamos recomeçar do início! 💔';
+    hmStatusEl.classList.add('show', 'lost');
+    setTimeout(() => {
+      hmWordEl.classList.remove('shake');
+      hmInit();
+    }, 2000);
   }
 }
 
 function hmGuess(rawCh){
-  if (hmWon || hmLost) return;
+  if (hmLocked) return;
   const ch = hmNormalize(rawCh);
   if (!HM_KEYS.includes(ch) || hmGuessed.has(ch)) return;
   hmGuessed.add(ch);
@@ -1140,6 +1157,11 @@ function hmGuess(rawCh){
   hmRender();
   hmCheckState();
 }
+
+hmNextBtn.addEventListener('click', () => {
+  hmIndex++;
+  hmStartWord();
+});
 
 function openHangmanPage(){
   hmInit();
@@ -1158,159 +1180,8 @@ document.addEventListener('keydown', (e) => {
   if (hangmanPage.classList.contains('open')){
     if (e.key === 'Escape') closeHangmanPage();
     else if (/^[a-zA-ZçÇáÁéÉíÍóÓúÚãÃõÕâÂêÊôÔ]$/.test(e.key)) hmGuess(e.key);
-  } else if (crosswordPage.classList.contains('open')){
-    if (e.key === 'Escape') closeCrosswordPage();
-    else if (/^[a-zA-ZçÇáÁéÉíÍóÓúÚãÃõÕâÂêÊôÔ]$/.test(e.key)) cwGuess(e.key);
   }
 });
-
-/* ====================== Palavras cruzadas (mesmo estilo da forca) ====================== */
-const crosswordPage = document.getElementById('crosswordPage');
-const cwWordEl = document.getElementById('cwWordEl');
-const cwHeartsEl = document.getElementById('cwHearts');
-const cwStatusEl = document.getElementById('cwStatus');
-const cwStatusText = document.getElementById('cwStatusText');
-const cwFinalEl = document.getElementById('cwFinal');
-const cwNextBtn = document.getElementById('cwNextBtn');
-
-let cwItems = [];
-let cwIndex = 0;
-let cwAnswer = '';
-let cwGuessed = new Set();
-let cwWrong = 0;
-let cwLocked = false;
-
-function buildCrosswordKeyboard(){
-  const kb = document.getElementById('cwKeyboard');
-  kb.innerHTML = '';
-  HM_KEYS.forEach(ch => {
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'hm-key';
-    btn.textContent = ch;
-    btn.dataset.letter = ch;
-    btn.addEventListener('click', () => cwGuess(ch));
-    kb.appendChild(btn);
-  });
-}
-buildCrosswordKeyboard();
-
-function cwLoadItems(){
-  const source = (CONFIG.crossword && CONFIG.crossword.length) ? CONFIG.crossword : DEFAULT_CONFIG.crossword;
-  cwItems = source.filter(it => it && (it.answer || '').trim());
-}
-
-function cwInit(){
-  cwLoadItems();
-  cwIndex = 0;
-  cwFinalEl.classList.remove('show');
-  if (cwItems.length) cwStartWord();
-}
-
-function cwStartWord(){
-  const item = cwItems[cwIndex];
-  cwAnswer = (item.answer || '').trim().toUpperCase();
-  cwGuessed = new Set();
-  cwWrong = 0;
-  cwLocked = false;
-  document.getElementById('cwClue').textContent = item.clue || '';
-  document.getElementById('cwCounter').textContent = `${cwIndex + 1} / ${cwItems.length}`;
-  cwStatusEl.classList.remove('show', 'lost');
-  cwNextBtn.style.display = 'none';
-  cwFinalEl.classList.remove('show');
-  cwRenderWord();
-}
-
-function cwRenderWord(){
-  cwWordEl.innerHTML = '';
-  [...cwAnswer].forEach(ch => {
-    const tile = document.createElement('span');
-    tile.className = 'hm-tile';
-    if (ch === ' '){
-      tile.classList.add('space');
-    } else if (cwGuessed.has(ch)){
-      tile.textContent = ch;
-      tile.classList.add('revealed');
-    }
-    cwWordEl.appendChild(tile);
-  });
-
-  cwHeartsEl.innerHTML = '';
-  for (let i = 0; i < HM_MAX_WRONG; i++){
-    const h = document.createElement('span');
-    const lost = i >= (HM_MAX_WRONG - cwWrong);
-    h.textContent = lost ? '♡' : '♥';
-    h.className = 'hm-heart' + (lost ? ' lost' : '');
-    cwHeartsEl.appendChild(h);
-  }
-
-  document.querySelectorAll('#cwKeyboard .hm-key').forEach(btn => {
-    const ch = btn.dataset.letter;
-    const guessed = cwGuessed.has(ch);
-    btn.disabled = guessed || cwLocked;
-    btn.classList.toggle('correct', guessed && cwAnswer.includes(ch));
-    btn.classList.toggle('wrong', guessed && !cwAnswer.includes(ch));
-  });
-}
-
-function cwGuess(rawCh){
-  if (cwLocked) return;
-  const ch = hmNormalize(rawCh);
-  if (!HM_KEYS.includes(ch) || cwGuessed.has(ch)) return;
-  cwGuessed.add(ch);
-  if (!cwAnswer.includes(ch)) cwWrong++;
-  cwRenderWord();
-  cwCheckState();
-}
-
-function cwCheckState(){
-  const lettersOnly = [...cwAnswer].filter(c => c !== ' ');
-  const allGuessed = lettersOnly.every(c => cwGuessed.has(c));
-  if (allGuessed){
-    cwLocked = true;
-    cwRenderWord();
-    burstConfetti();
-    cwStatusText.textContent = cwItems[cwIndex].message || '';
-    cwStatusEl.classList.remove('lost');
-    cwStatusEl.classList.add('show');
-    if (cwIndex < cwItems.length - 1){
-      cwNextBtn.style.display = '';
-    } else {
-      requestAnimationFrame(() => cwFinalEl.classList.add('show'));
-    }
-  } else if (cwWrong >= HM_MAX_WRONG){
-    cwLocked = true;
-    cwRenderWord();
-    cwWordEl.classList.add('shake');
-    cwStatusText.textContent = 'Você perdeu todos os corações... vamos recomeçar do início! 💔';
-    cwStatusEl.classList.add('show', 'lost');
-    setTimeout(() => {
-      cwWordEl.classList.remove('shake');
-      cwInit();
-    }, 2000);
-  }
-}
-
-cwNextBtn.addEventListener('click', () => {
-  cwIndex++;
-  cwStartWord();
-});
-
-function openCrosswordPage(){
-  cwInit();
-  crosswordPage.classList.add('open');
-  document.body.style.overflow = 'hidden';
-}
-function closeCrosswordPage(){
-  crosswordPage.classList.remove('open');
-  document.body.style.overflow = '';
-}
-document.getElementById('hmContinueBtn').addEventListener('click', () => {
-  closeHangmanPage();
-  setTimeout(openCrosswordPage, 350);
-});
-document.getElementById('crosswordBack').addEventListener('click', closeCrosswordPage);
-document.getElementById('crosswordRestartBtn').addEventListener('click', cwInit);
 
 loadConfig();
 </script>
