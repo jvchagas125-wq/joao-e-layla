@@ -361,15 +361,7 @@
   .hm-word.shake{animation:hmShake 0.5s ease;}
 
   /* ====================== Palavras cruzadas ====================== */
-  .cw-clue{max-width:380px; text-align:center; font-family:'Fraunces', serif; font-style:italic; font-size:15.5px; line-height:1.7; opacity:0.92; margin:0 0 24px;}
-  .cw-controls{display:flex; gap:10px; margin-top:18px;}
-  .cw-ctrl-btn{
-    padding:10px 22px; border-radius:999px; font-family:'Space Grotesk', sans-serif; font-weight:600; font-size:12.5px;
-    cursor:pointer; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.06); color:var(--cream);
-    transition:transform 0.15s ease, opacity 0.2s ease;
-  }
-  .cw-ctrl-btn:active{transform:scale(0.94);}
-  .cw-ctrl-btn:disabled{opacity:0.3; cursor:default;}
+  .cw-clue{max-width:380px; text-align:center; font-family:'Fraunces', serif; font-style:italic; font-size:15.5px; line-height:1.7; opacity:0.92; margin:0 0 20px;}
   .cw-final{margin-top:22px; text-align:center; font-family:'Fraunces', serif; font-style:italic; font-size:14px; opacity:0; transform:translateY(10px); transition:opacity 0.6s ease, transform 0.6s ease;}
   .cw-final.show{opacity:0.75; transform:translateY(0);}
 </style>
@@ -522,11 +514,9 @@
   <h2 class="hangman-title">Palavras cruzadas</h2>
   <p class="hangman-sub" id="cwCounter">1 / 1</p>
   <p class="cw-clue" id="cwClue"></p>
+  <div class="hm-hearts" id="cwHearts"></div>
   <div class="hm-word" id="cwWordEl"></div>
   <div class="hm-keyboard" id="cwKeyboard"></div>
-  <div class="cw-controls">
-    <button type="button" class="cw-ctrl-btn" id="cwBackspaceBtn">⌫ Apagar</button>
-  </div>
   <div class="hm-status" id="cwStatus"><span class="hm-status-heart">♥</span><span id="cwStatusText"></span></div>
   <button class="letter-btn hangman-open-btn" id="cwNextBtn" style="display:none;">Próxima palavra ›</button>
   <p class="cw-final" id="cwFinal">Você descobriu todas as palavras! 💕</p>
@@ -1170,14 +1160,14 @@ document.addEventListener('keydown', (e) => {
     else if (/^[a-zA-ZçÇáÁéÉíÍóÓúÚãÃõÕâÂêÊôÔ]$/.test(e.key)) hmGuess(e.key);
   } else if (crosswordPage.classList.contains('open')){
     if (e.key === 'Escape') closeCrosswordPage();
-    else if (e.key === 'Backspace') cwBackspace();
-    else if (/^[a-zA-ZçÇáÁéÉíÍóÓúÚãÃõÕâÂêÊôÔ]$/.test(e.key)) cwType(e.key);
+    else if (/^[a-zA-ZçÇáÁéÉíÍóÓúÚãÃõÕâÂêÊôÔ]$/.test(e.key)) cwGuess(e.key);
   }
 });
 
-/* ====================== Palavras cruzadas ====================== */
+/* ====================== Palavras cruzadas (mesmo estilo da forca) ====================== */
 const crosswordPage = document.getElementById('crosswordPage');
 const cwWordEl = document.getElementById('cwWordEl');
+const cwHeartsEl = document.getElementById('cwHearts');
 const cwStatusEl = document.getElementById('cwStatus');
 const cwStatusText = document.getElementById('cwStatusText');
 const cwFinalEl = document.getElementById('cwFinal');
@@ -1186,7 +1176,9 @@ const cwNextBtn = document.getElementById('cwNextBtn');
 let cwItems = [];
 let cwIndex = 0;
 let cwAnswer = '';
-let cwEntered = [];
+let cwGuessed = new Set();
+let cwWrong = 0;
+let cwLocked = false;
 
 function buildCrosswordKeyboard(){
   const kb = document.getElementById('cwKeyboard');
@@ -1197,7 +1189,7 @@ function buildCrosswordKeyboard(){
     btn.className = 'hm-key';
     btn.textContent = ch;
     btn.dataset.letter = ch;
-    btn.addEventListener('click', () => cwType(ch));
+    btn.addEventListener('click', () => cwGuess(ch));
     kb.appendChild(btn);
   });
 }
@@ -1218,79 +1210,84 @@ function cwInit(){
 function cwStartWord(){
   const item = cwItems[cwIndex];
   cwAnswer = (item.answer || '').trim().toUpperCase();
-  cwEntered = [];
+  cwGuessed = new Set();
+  cwWrong = 0;
+  cwLocked = false;
   document.getElementById('cwClue').textContent = item.clue || '';
   document.getElementById('cwCounter').textContent = `${cwIndex + 1} / ${cwItems.length}`;
-  cwStatusEl.classList.remove('show');
+  cwStatusEl.classList.remove('show', 'lost');
   cwNextBtn.style.display = 'none';
   cwFinalEl.classList.remove('show');
-  cwSetControlsEnabled(true);
   cwRenderWord();
 }
 
 function cwRenderWord(){
   cwWordEl.innerHTML = '';
-  [...cwAnswer].forEach((ch, i) => {
+  [...cwAnswer].forEach(ch => {
     const tile = document.createElement('span');
     tile.className = 'hm-tile';
     if (ch === ' '){
       tile.classList.add('space');
-    } else if (cwEntered[i]){
-      tile.textContent = cwEntered[i];
+    } else if (cwGuessed.has(ch)){
+      tile.textContent = ch;
       tile.classList.add('revealed');
     }
     cwWordEl.appendChild(tile);
   });
-}
 
-function cwSetControlsEnabled(enabled){
-  document.querySelectorAll('#cwKeyboard .hm-key').forEach(btn => { btn.disabled = !enabled; });
-  document.getElementById('cwBackspaceBtn').disabled = !enabled;
-}
-
-function cwNextEmptyIndex(){
-  for (let i = 0; i < cwAnswer.length; i++){
-    if (cwAnswer[i] !== ' ' && !cwEntered[i]) return i;
+  cwHeartsEl.innerHTML = '';
+  for (let i = 0; i < HM_MAX_WRONG; i++){
+    const h = document.createElement('span');
+    const lost = i >= (HM_MAX_WRONG - cwWrong);
+    h.textContent = lost ? '♡' : '♥';
+    h.className = 'hm-heart' + (lost ? ' lost' : '');
+    cwHeartsEl.appendChild(h);
   }
-  return -1;
+
+  document.querySelectorAll('#cwKeyboard .hm-key').forEach(btn => {
+    const ch = btn.dataset.letter;
+    const guessed = cwGuessed.has(ch);
+    btn.disabled = guessed || cwLocked;
+    btn.classList.toggle('correct', guessed && cwAnswer.includes(ch));
+    btn.classList.toggle('wrong', guessed && !cwAnswer.includes(ch));
+  });
 }
 
-function cwType(rawCh){
+function cwGuess(rawCh){
+  if (cwLocked) return;
   const ch = hmNormalize(rawCh);
-  if (!HM_KEYS.includes(ch)) return;
-  const idx = cwNextEmptyIndex();
-  if (idx === -1) return;
-  cwEntered[idx] = ch;
+  if (!HM_KEYS.includes(ch) || cwGuessed.has(ch)) return;
+  cwGuessed.add(ch);
+  if (!cwAnswer.includes(ch)) cwWrong++;
   cwRenderWord();
-  if (cwNextEmptyIndex() === -1) cwCheck();
+  cwCheckState();
 }
 
-function cwBackspace(){
-  for (let i = cwAnswer.length - 1; i >= 0; i--){
-    if (cwAnswer[i] !== ' ' && cwEntered[i]){ cwEntered[i] = null; break; }
-  }
-  cwRenderWord();
-}
-
-function cwCheck(){
-  const guess = [...cwAnswer].map((ch, i) => ch === ' ' ? ' ' : (cwEntered[i] || '')).join('');
-  if (guess === cwAnswer){
-    cwSetControlsEnabled(false);
+function cwCheckState(){
+  const lettersOnly = [...cwAnswer].filter(c => c !== ' ');
+  const allGuessed = lettersOnly.every(c => cwGuessed.has(c));
+  if (allGuessed){
+    cwLocked = true;
+    cwRenderWord();
     burstConfetti();
     cwStatusText.textContent = cwItems[cwIndex].message || '';
+    cwStatusEl.classList.remove('lost');
     cwStatusEl.classList.add('show');
     if (cwIndex < cwItems.length - 1){
       cwNextBtn.style.display = '';
     } else {
       requestAnimationFrame(() => cwFinalEl.classList.add('show'));
     }
-  } else {
+  } else if (cwWrong >= HM_MAX_WRONG){
+    cwLocked = true;
+    cwRenderWord();
     cwWordEl.classList.add('shake');
+    cwStatusText.textContent = 'Você perdeu todos os corações... vamos recomeçar do início! 💔';
+    cwStatusEl.classList.add('show', 'lost');
     setTimeout(() => {
-      cwEntered = [];
       cwWordEl.classList.remove('shake');
-      cwRenderWord();
-    }, 480);
+      cwInit();
+    }, 2000);
   }
 }
 
@@ -1298,7 +1295,6 @@ cwNextBtn.addEventListener('click', () => {
   cwIndex++;
   cwStartWord();
 });
-document.getElementById('cwBackspaceBtn').addEventListener('click', cwBackspace);
 
 function openCrosswordPage(){
   cwInit();
