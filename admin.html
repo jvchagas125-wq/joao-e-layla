@@ -168,6 +168,13 @@
     <textarea id="hangmanWinMessage" style="min-height:90px;" placeholder="Mensagem que aparece quando a palavra é descoberta..."></textarea>
   </div>
 
+  <div class="card">
+    <h2>Palavras cruzadas</h2>
+    <p class="field-hint" style="margin:0 0 12px;">Aparece um botão "Continuar game🤭" ao acertar o jogo da forca, abrindo essa sequência de dicas e respostas.</p>
+    <div id="crosswordWrap"></div>
+    <button type="button" id="addCrosswordBtn" style="margin-top:6px; padding:10px 18px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:var(--cream); font-size:13px;">+ Adicionar palavra</button>
+  </div>
+
   <button class="save-btn" id="saveBtn">Salvar alterações</button>
   <p class="status" id="statusMsg"></p>
 </div>
@@ -222,7 +229,17 @@ const DEFAULT_CONFIG = {
   playerPhotoUrls: [],
   gallery: [],
   hangmanWord: "Princesa",
-  hangmanWinMessage: "Deus e Nossa Senhora mandou muito para mim uma princesa, uma que nem a Disney tem, te amo muito! 🥰❤️"
+  hangmanWinMessage: "Deus e Nossa Senhora mandou muito para mim uma princesa, uma que nem a Disney tem, te amo muito! 🥰❤️",
+  crossword: [
+    { clue: "Uma coisa que eu gosto de fazer muito para te vê feliz...", answer: "MIMAR", message: "Eu fico tão feliz quando eu mimo você porque fica tão fofa e feliz!🤭" },
+    { clue: "Eu amo o seu...", answer: "BEIJO", message: "O seu beijo é umas das melhores coisas que existe no mundo!🤤❤️" },
+    { clue: "Amo apertar...", answer: "PERNAS", message: "Essas pernas me deixam doido meu Deus do céu, muito fofo, vontade de apertar sempre! 😍" },
+    { clue: "Gosto de chamar...", answer: "BOTINHO", message: "Esse apelido combinou muito com você, acho tão fofo! 🤭❤️" },
+    { clue: "Uma das coisas que eu gosto de fazer com você...", answer: "REZAR", message: "Sinto que conquistamos mais coisas no nosso futuro quando rezamos juntos! ❤️🙏" },
+    { clue: "Uma das coisas que eu gosto quando você faz em mim...", answer: "CAFUNÉ", message: "Uma das coisas que eu passei a amar depois que eu te conheci foi o cafuné que você faz em mim, é algo mágico, seu carinho é maravilhoso! ❤️" },
+    { clue: "Uma coisa que eu faço que te deixa sem graça...", answer: "OLHAR", message: "Eu amo tanto ficar te olhando, contemplando e só pensando o quanto eu te amo mas é engraçado quando você fica sem graça 🤣❤️" },
+    { clue: "Uma das coisas que eu gosto quando você quer ser romântica...", answer: "PALAVRAS", message: "Quando você fala que me ama, que está saudades, está com saudades do meu abraço, do meu beijo, de mim! Quando faz cartas com do seu jeito com as palavras bonitas e textos enormes eu me emociono demais, é uma das coisas que eu mais fico feliz quando você faz!🥹❤️" }
+  ]
 };
 
 let CONFIG = null;
@@ -345,6 +362,7 @@ function fillForm(){
 
   renderPlayerPhotos();
   renderGallery();
+  renderCrossword();
 }
 
 function currentPlayerUrls(){
@@ -473,6 +491,67 @@ document.getElementById('addGalleryBtn').addEventListener('click', () => {
   items.push({ url: '', title: '', message: '' });
   CONFIG.gallery = items;
   renderGallery();
+});
+
+function currentCrossword(){
+  return CONFIG.crossword || [];
+}
+
+function renderCrossword(){
+  const wrap = document.getElementById('crosswordWrap');
+  wrap.innerHTML = "";
+  const items = currentCrossword();
+  items.forEach((item, i) => {
+    const block = document.createElement('div');
+    block.className = 'story-block';
+    block.innerHTML = `
+      <label>Palavra ${i + 1} — Dica</label>
+      <input type="text" data-cw-clue="${i}" value="${escapeHtml(item.clue || '')}" placeholder="Ex: Eu amo o seu...">
+      <label>Resposta</label>
+      <input type="text" data-cw-answer="${i}" value="${escapeHtml(item.answer || '')}" placeholder="Ex: BEIJO">
+      <label>Frase ao completar</label>
+      <textarea data-cw-message="${i}" placeholder="Mensagem que aparece ao acertar essa palavra...">${escapeHtml(item.message || '')}</textarea>
+      <button type="button" class="del-photo-btn" data-cw-remove="${i}" style="margin-top:6px;">Remover palavra</button>
+    `;
+    wrap.appendChild(block);
+  });
+
+  wrap.querySelectorAll('input[data-cw-clue]').forEach(el => {
+    el.addEventListener('input', () => {
+      currentCrossword()[Number(el.dataset.cwClue)].clue = el.value;
+    });
+  });
+  wrap.querySelectorAll('input[data-cw-answer]').forEach(el => {
+    el.addEventListener('input', () => {
+      currentCrossword()[Number(el.dataset.cwAnswer)].answer = el.value.toUpperCase();
+    });
+  });
+  wrap.querySelectorAll('textarea[data-cw-message]').forEach(el => {
+    el.addEventListener('input', () => {
+      currentCrossword()[Number(el.dataset.cwMessage)].message = el.value;
+    });
+  });
+  wrap.querySelectorAll('button[data-cw-remove]').forEach(el => {
+    el.addEventListener('click', async () => {
+      const i = Number(el.dataset.cwRemove);
+      const ok = await confirmModal('Remover essa palavra?', 'Isso vai remover a dica, a resposta e a mensagem dela.', 'Remover');
+      if (!ok) return;
+      currentCrossword().splice(i, 1);
+      renderCrossword();
+      setStatus('Palavra removida — clique em Salvar para confirmar.', 'ok');
+    });
+  });
+}
+
+document.getElementById('addCrosswordBtn').addEventListener('click', () => {
+  const items = currentCrossword();
+  if (items.length >= 20){
+    alertModal('Limite atingido', 'Você pode adicionar até 20 palavras.', '✕');
+    return;
+  }
+  items.push({ clue: '', answer: '', message: '' });
+  CONFIG.crossword = items;
+  renderCrossword();
 });
 
 async function uploadToCloudinary(file, endpoint){
