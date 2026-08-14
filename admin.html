@@ -372,7 +372,10 @@ function fillForm(){
 }
 
 function currentPlayerUrls(){
-  return (CONFIG.playerPhotoUrls || []).filter(Boolean);
+  // Não filtra vazios aqui: um slot vazio "" representa uma foto ainda não
+  // enviada e precisa continuar aparecendo na tela até o usuário preencher
+  // ou removê-la. A limpeza dos vazios acontece só na hora de salvar.
+  return CONFIG.playerPhotoUrls || [];
 }
 
 function renderPlayerPhotos(){
@@ -607,6 +610,7 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   CONFIG.hangmanClue = document.getElementById('hangmanClue').value.trim();
   CONFIG.hangmanWord = document.getElementById('hangmanWord').value.trim() || DEFAULT_CONFIG.hangmanWord;
   CONFIG.hangmanWinMessage = document.getElementById('hangmanWinMessage').value.trim() || DEFAULT_CONFIG.hangmanWinMessage;
+  CONFIG.playerPhotoUrls = (CONFIG.playerPhotoUrls || []).filter(Boolean);
 
   const btn = document.getElementById('saveBtn');
   btn.disabled = true;
