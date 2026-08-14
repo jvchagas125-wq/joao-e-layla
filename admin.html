@@ -147,9 +147,10 @@
   </div>
 
   <div class="card">
-    <h2>Fotos do player (até 5)</h2>
+    <h2>Fotos do player</h2>
     <p class="field-hint" style="margin:0 0 12px;">Essas fotos alternam no quadrado da trilha sonora.</p>
     <div id="playerPhotosWrap"></div>
+    <button type="button" id="addPlayerPhotoBtn" style="margin-top:6px; padding:10px 18px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:var(--cream); font-size:13px;">+ Adicionar foto</button>
   </div>
 
   <div class="card">
@@ -378,7 +379,8 @@ function renderPlayerPhotos(){
   const wrap = document.getElementById('playerPhotosWrap');
   wrap.innerHTML = "";
   const urls = currentPlayerUrls();
-  for (let i = 0; i < 5; i++){
+  const total = Math.max(urls.length, 1);
+  for (let i = 0; i < total; i++){
     const url = urls[i] || "";
     const block = document.createElement('div');
     block.className = 'story-block';
@@ -420,6 +422,17 @@ function renderPlayerPhotos(){
     });
   });
 }
+
+document.getElementById('addPlayerPhotoBtn').addEventListener('click', () => {
+  const urls = currentPlayerUrls();
+  if (urls.length >= 20){
+    alertModal('Limite atingido', 'Você pode adicionar até 20 fotos no player.', '✕');
+    return;
+  }
+  urls.push('');
+  CONFIG.playerPhotoUrls = urls;
+  renderPlayerPhotos();
+});
 
 function escapeHtml(str){
   return (str || "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
