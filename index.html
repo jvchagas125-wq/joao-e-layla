@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title id="pageTitle">João &amp; Layla</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23f4b8c7' d='M16 28.6 3.8 16.9C1.4 14.6 0 11.7 0 8.6 0 3.9 3.8 0 8.5 0c2.6 0 5.1 1.2 6.7 3.2L16 4.3l0.8-1.1C18.4 1.2 20.9 0 23.5 0 28.2 0 32 3.9 32 8.6c0 3.1-1.4 6-3.8 8.3L16 28.6z'/%3E%3C/svg%3E">
+<!-- ====== PWA: instalação como app ====== -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4A2039">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="J &amp; L">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,600;1,500;1,600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://www.gstatic.com/firebasejs/10.13.0/firebase-app-compat.js"></script>
@@ -153,6 +160,46 @@
   footer p{font-family:'Fraunces', serif; font-style:italic; font-size:15px; opacity:0.75; line-height:1.6; margin:0;}
   footer .sign{display:block; margin-top:10px; font-size:11px; opacity:0.5; font-style:normal; letter-spacing:0.08em; text-transform:uppercase;}
   .admin-link{position:fixed; bottom:8px; right:10px; font-size:10px; opacity:0.15; color:var(--cream); text-decoration:none; z-index:5;}
+
+  /* ====================== Botão de instalar app (PWA) ====================== */
+  #installFab{
+    position:fixed; bottom:24px; right:20px; z-index:60;
+    width:52px; height:52px; border-radius:50%; border:none; cursor:pointer;
+    background:linear-gradient(120deg, var(--gold), var(--rose));
+    box-shadow:0 10px 26px rgba(217,169,92,0.35), 0 0 0 1px rgba(255,255,255,0.08) inset;
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; visibility:hidden; transform:translateY(10px) scale(0.9);
+    transition:opacity 0.35s ease, transform 0.35s ease, visibility 0.35s;
+  }
+  #installFab.show{opacity:1; visibility:visible; transform:translateY(0) scale(1);}
+  #installFab svg{width:22px; height:22px; color:var(--ink);}
+  #installFab:focus-visible{outline:2px solid var(--cream); outline-offset:3px;}
+  #installFab:active{transform:scale(0.94);}
+  @keyframes fabPulse{
+    0%,100%{box-shadow:0 10px 26px rgba(217,169,92,0.35), 0 0 0 1px rgba(255,255,255,0.08) inset;}
+    50%{box-shadow:0 10px 30px rgba(244,184,199,0.55), 0 0 0 1px rgba(255,255,255,0.08) inset;}
+  }
+  #installFab.show{animation:fabPulse 2.8s ease-in-out infinite;}
+
+  #installTip{
+    position:fixed; bottom:86px; right:20px; z-index:60;
+    max-width:230px; background:var(--cream); color:var(--ink);
+    border-radius:14px; padding:14px 16px; font-size:12.5px; line-height:1.55;
+    box-shadow:0 16px 34px rgba(0,0,0,0.4);
+    opacity:0; visibility:hidden; transform:translateY(8px);
+    transition:opacity 0.25s ease, transform 0.25s ease, visibility 0.25s;
+  }
+  #installTip.show{opacity:1; visibility:visible; transform:translateY(0);}
+  #installTip::after{
+    content:""; position:absolute; bottom:-7px; right:20px;
+    width:14px; height:14px; background:var(--cream);
+    transform:rotate(45deg); border-radius:2px;
+  }
+  #installTip b{display:block; margin-bottom:4px; font-family:'Fraunces', serif; font-style:italic; font-size:13px;}
+  #installTip .tip-close{
+    position:absolute; top:6px; right:8px; background:none; border:none;
+    font-size:14px; color:var(--ink); opacity:0.5; cursor:pointer; padding:4px;
+  }
 
   @media (prefers-reduced-motion: reduce){
     main, #entry{transition:none;}
@@ -498,6 +545,20 @@
 </div>
 
 <a class="admin-link" href="admin.html">admin</a>
+
+<!-- ====================== Botão de instalar app (PWA) ====================== -->
+<div id="installTip" role="dialog" aria-live="polite">
+  <button type="button" class="tip-close" id="installTipClose" aria-label="Fechar">✕</button>
+  <b>Adicionar à tela de início</b>
+  Toque em <strong>Compartilhar</strong> (o ícone com a seta ↑) e depois em <strong>“Adicionar à Tela de Início”</strong>.
+</div>
+<button id="installFab" type="button" aria-label="Instalar aplicativo">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12 3v12"/>
+    <path d="M7 10l5 5 5-5"/>
+    <path d="M5 21h14"/>
+  </svg>
+</button>
 
 <div class="letter-page" id="letterPage">
   <div class="letter-page-hearts" id="letterPageHearts"></div>
@@ -1261,6 +1322,75 @@ document.addEventListener('keydown', (e) => {
 });
 
 loadConfig();
+
+/* ====================== PWA: instalar como app ====================== */
+(function(){
+  const fab = document.getElementById('installFab');
+  const tip = document.getElementById('installTip');
+  const tipClose = document.getElementById('installTipClose');
+  let deferredPrompt = null;
+
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+
+  const isIOS = /iphone|ipad|ipod/i.test(window.navigator.userAgent)
+    && !window.MSStream;
+
+  if (isStandalone){
+    // já instalado — não mostra o botão
+    return;
+  }
+
+  if ('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  }
+
+  function showFab(){
+    fab.classList.add('show');
+  }
+  function hideFab(){
+    fab.classList.remove('show');
+    tip.classList.remove('show');
+  }
+
+  // Android / Chrome / Edge: evento nativo de instalação
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    showFab();
+  });
+
+  window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    hideFab();
+  });
+
+  // iOS Safari não dispara beforeinstallprompt — mostramos o botão com instruções
+  if (isIOS){
+    showFab();
+  }
+
+  fab.addEventListener('click', async () => {
+    if (deferredPrompt){
+      fab.classList.remove('show');
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if (outcome !== 'accepted') fab.classList.add('show');
+      return;
+    }
+    // iOS ou navegador sem suporte nativo: mostra o passo a passo
+    tip.classList.toggle('show');
+  });
+
+  tipClose.addEventListener('click', () => tip.classList.remove('show'));
+
+  document.addEventListener('click', (e) => {
+    if (tip.classList.contains('show') && !tip.contains(e.target) && e.target !== fab){
+      tip.classList.remove('show');
+    }
+  });
+})();
 </script>
 </body>
 </html>
