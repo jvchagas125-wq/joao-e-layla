@@ -161,6 +161,14 @@
   </div>
 
   <div class="card">
+    <h2>Jogo da memória</h2>
+    <p class="field-hint" style="margin:0 0 12px;">Depois de terminar o "Adivinhe a palavra", aparece um botão para abrir o jogo da memória com essas fotos. São sempre 6 pares (12 cartas) — se deixar alguma foto vazia, aparece um coração no lugar dela.</p>
+    <label>Mensagem ao completar o jogo</label>
+    <textarea id="memoryWinMessage" style="min-height:80px;" placeholder="Mensagem que aparece quando todos os pares forem encontrados..."></textarea>
+    <div id="memoryPhotosWrap"></div>
+  </div>
+
+  <div class="card">
     <h2>Adivinhe a palavra — 1ª palavra</h2>
     <p class="field-hint" style="margin:0 0 12px;">Aparece um botão "Play Game ❤️🎮" no final da galeria de fotos, abrindo o jogo "Adivinhe a palavra". Essa é a primeira palavra do jogo.</p>
     <label>Dica</label>
@@ -232,6 +240,8 @@ const DEFAULT_CONFIG = {
   loveLetter: "",
   playerPhotoUrls: [],
   gallery: [],
+  memoryPhotos: [],
+  memoryWinMessage: "Cada foto dessas é um pedacinho da nossa história e eu quero guardar cada uma bem pertinho do coração! 🤍❤️",
   hangmanClue: "",
   hangmanWord: "Princesa",
   hangmanWinMessage: "Deus e Nossa Senhora mandou muito para mim uma princesa, uma que nem a Disney tem, te amo muito! 🥰❤️",
@@ -366,8 +376,11 @@ function fillForm(){
     }catch(e){ setStatus('Falha ao enviar a música: ' + e.message, 'err'); }
   });
 
+  document.getElementById('memoryWinMessage').value = CONFIG.memoryWinMessage || DEFAULT_CONFIG.memoryWinMessage;
+
   renderPlayerPhotos();
   renderGallery();
+  renderMemoryPhotos();
   renderCrossword();
 }
 
@@ -514,6 +527,62 @@ document.getElementById('addGalleryBtn').addEventListener('click', () => {
   renderGallery();
 });
 
+const MEMORY_PAIRS = 6;
+
+function currentMemoryPhotos(){
+  const arr = (CONFIG.memoryPhotos || []).slice(0, MEMORY_PAIRS);
+  while (arr.length < MEMORY_PAIRS) arr.push('');
+  CONFIG.memoryPhotos = arr;
+  return arr;
+}
+
+function renderMemoryPhotos(){
+  const wrap = document.getElementById('memoryPhotosWrap');
+  wrap.innerHTML = "";
+  const urls = currentMemoryPhotos();
+  urls.forEach((url, i) => {
+    const block = document.createElement('div');
+    block.className = 'story-block';
+    block.innerHTML = `
+      <label>Foto ${i + 1}</label>
+      <div class="thumb-row">
+        <img class="thumb" src="${url}" style="${url ? '' : 'opacity:0;'}" onerror="this.style.opacity=0">
+        <input type="file" accept="image/*" data-memory-upload="${i}">
+        <button type="button" class="del-photo-btn" data-memory-remove="${i}" style="${url ? '' : 'display:none;'}">Remover</button>
+      </div>`;
+    wrap.appendChild(block);
+  });
+
+  wrap.querySelectorAll('input[type=file][data-memory-upload]').forEach(el => {
+    el.addEventListener('change', async () => {
+      const i = Number(el.dataset.memoryUpload);
+      const file = el.files[0];
+      if (!file) return;
+      setStatus('Enviando foto...', '');
+      try{
+        const url = await uploadToCloudinary(file, IMAGE_UPLOAD_URL);
+        const urls = currentMemoryPhotos();
+        urls[i] = url;
+        CONFIG.memoryPhotos = urls;
+        renderMemoryPhotos();
+        setStatus('Foto enviada ✓', 'ok');
+      }catch(e){ setStatus('Falha ao enviar a foto: ' + e.message, 'err'); }
+    });
+  });
+  wrap.querySelectorAll('button[data-memory-remove]').forEach(el => {
+    el.addEventListener('click', async () => {
+      const i = Number(el.dataset.memoryRemove);
+      const ok = await confirmModal('Remover foto?', 'Isso vai remover essa foto do jogo da memória (fica um coração no lugar dela).', 'Remover');
+      if (!ok) return;
+      const urls = currentMemoryPhotos();
+      urls[i] = '';
+      CONFIG.memoryPhotos = urls;
+      renderMemoryPhotos();
+      setStatus('Foto removida — clique em Salvar para confirmar.', 'ok');
+    });
+  });
+}
+
 function currentCrossword(){
   return CONFIG.crossword || [];
 }
@@ -611,6 +680,8 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   CONFIG.hangmanWord = document.getElementById('hangmanWord').value.trim() || DEFAULT_CONFIG.hangmanWord;
   CONFIG.hangmanWinMessage = document.getElementById('hangmanWinMessage').value.trim() || DEFAULT_CONFIG.hangmanWinMessage;
   CONFIG.playerPhotoUrls = (CONFIG.playerPhotoUrls || []).filter(Boolean);
+  CONFIG.memoryWinMessage = document.getElementById('memoryWinMessage').value.trim() || DEFAULT_CONFIG.memoryWinMessage;
+  CONFIG.memoryPhotos = (CONFIG.memoryPhotos || []).filter(Boolean);
 
   const btn = document.getElementById('saveBtn');
   btn.disabled = true;
