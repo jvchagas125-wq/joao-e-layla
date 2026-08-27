@@ -1078,14 +1078,22 @@ async function setupYouTube(videoId){
   return new Promise((resolve) => {
     ytPlayer = new YT.Player('ytPlayerHost', {
       height: '1', width: '1', videoId,
-      playerVars: { controls:0, disablekb:1, fs:0, modestbranding:1, iv_load_policy:3, playsinline:1, rel:0 },
+      // loop+playlist (com o mesmo videoId) faz o próprio YouTube repetir o vídeo;
+      // o onStateChange abaixo é um reforço caso o loop nativo não dispare.
+      playerVars: { controls:0, disablekb:1, fs:0, modestbranding:1, iv_load_policy:3, playsinline:1, rel:0, loop:1, playlist:videoId },
       events: {
         onReady: () => {
           ytReady = true;
           durTime.textContent = fmt(ytPlayer.getDuration());
           resolve();
         },
-        onStateChange: () => updatePlayIcon()
+        onStateChange: (e) => {
+          updatePlayIcon();
+          if (e.data === YT.PlayerState.ENDED){
+            ytPlayer.seekTo(0, true);
+            ytPlayer.playVideo();
+          }
+        }
       }
     });
   });
