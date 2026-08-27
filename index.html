@@ -312,7 +312,7 @@
 
   /* ====================== Página final (jogo concluído) ====================== */
   .final-page{
-    position:fixed; inset:0; z-index:99; overflow-y:auto;
+    position:fixed; inset:0; z-index:100; overflow-y:auto;
     background:
       radial-gradient(ellipse 90% 55% at 50% -10%, rgba(244,184,199,0.2), transparent),
       radial-gradient(ellipse 70% 45% at 100% 100%, rgba(217,169,92,0.18), transparent),
@@ -407,8 +407,8 @@
   .gallery-counter{margin-top:10px; font-size:11px; letter-spacing:0.08em; text-transform:uppercase; opacity:0.5;}
   .hangman-open-btn{margin-top:30px;}
 
-  /* ====================== Jogo da forca ====================== */
-  .hangman-page{
+  /* ====================== Jogo da forca / Jogo da memória ====================== */
+  .hangman-page, .memory-page{
     position:fixed; inset:0; z-index:98; overflow-y:auto;
     background:
       radial-gradient(ellipse 80% 50% at 50% -10%, rgba(244,184,199,0.15), transparent),
@@ -419,7 +419,8 @@
     transition:opacity 0.6s cubic-bezier(.22,.9,.24,1), transform 0.6s cubic-bezier(.22,.9,.24,1), visibility 0.6s;
     display:flex; flex-direction:column; align-items:center; padding:90px 20px 60px;
   }
-  .hangman-page.open{opacity:1; visibility:visible; pointer-events:auto; transform:translateY(0) scale(1);}
+  .memory-page{ z-index:99; }
+  .hangman-page.open, .memory-page.open{opacity:1; visibility:visible; pointer-events:auto; transform:translateY(0) scale(1);}
   .hangman-restart-btn{
     position:fixed; top:18px; right:16px; z-index:2;
     display:inline-flex; align-items:center; gap:6px;
@@ -465,6 +466,34 @@
   .cw-final{margin-top:22px; text-align:center; font-family:'Fraunces', serif; font-style:italic; font-size:14px; opacity:0; transform:translateY(10px); transition:opacity 0.6s ease, transform 0.6s ease;}
   .cw-final.show{opacity:0.75; transform:translateY(0);}
   .hangman-open-btn.cw-final.show{opacity:1;}
+
+  /* ====================== Jogo da memória ====================== */
+  .memory-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;
+    width:100%; max-width:340px; margin:4px 0 8px;
+  }
+  .memory-card{position:relative; aspect-ratio:3/4; cursor:pointer; perspective:800px;}
+  .memory-card-inner{
+    position:relative; width:100%; height:100%; transform-style:preserve-3d;
+    transition:transform 0.5s cubic-bezier(.4,.2,.2,1);
+  }
+  .memory-card.flipped .memory-card-inner, .memory-card.matched .memory-card-inner{transform:rotateY(180deg);}
+  .memory-card-face{
+    position:absolute; inset:0; backface-visibility:hidden; border-radius:12px;
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+  }
+  .memory-card-back{
+    background:linear-gradient(160deg, var(--wine), var(--night));
+    border:1px solid rgba(217,169,92,0.28); color:var(--gold); font-size:20px;
+  }
+  .memory-card-front{
+    transform:rotateY(180deg); background:rgba(255,255,255,0.06);
+    border:1px solid rgba(217,169,92,0.25);
+  }
+  .memory-card-front img{width:100%; height:100%; object-fit:cover; display:block;}
+  .memory-card.matched{opacity:0.6;}
+  .memory-card.matched .memory-card-front{box-shadow:0 0 0 2px var(--gold) inset;}
+  .memory-card.shake .memory-card-inner{animation:hmShake 0.45s ease;}
 </style>
 </head>
 <body>
@@ -618,7 +647,24 @@
   <div class="hm-keyboard" id="hmKeyboard"></div>
   <div class="hm-status" id="hmStatus"><span class="hm-status-heart">♥</span><span id="hmStatusText"></span></div>
   <button class="letter-btn hangman-open-btn" id="hmNextBtn" style="display:none;">Próxima palavra🤭</button>
-  <button class="letter-btn hangman-open-btn cw-final" id="hmFinalBtn" style="display:none;">Finalizar 💍</button>
+  <button class="letter-btn hangman-open-btn cw-final" id="hmFinalBtn" style="display:none;">Mais um joguinho? 🧠</button>
+</div>
+
+<div class="memory-page" id="memoryPage">
+  <div class="page-hearts" id="memoryPageHearts"></div>
+  <button class="letter-page-back" id="memoryBack" aria-label="Voltar">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 4.5 8 12l7.5 7.5 1.4-1.4L10.8 12l6.1-6.1z"/></svg>
+    Voltar
+  </button>
+  <button class="hangman-restart-btn" id="memoryRestartBtn" aria-label="Reiniciar">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 7l5 5V8c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+    Reiniciar
+  </button>
+  <h2 class="hangman-title">Jogo da memória</h2>
+  <p class="hangman-sub" id="memoryCounter">0 / 6 pares</p>
+  <div class="memory-grid" id="memoryGrid"></div>
+  <div class="hm-status" id="memoryStatus"><span class="hm-status-heart">♥</span><span id="memoryStatusText"></span></div>
+  <button class="letter-btn hangman-open-btn cw-final" id="memoryFinalBtn" style="display:none;">Finalizar 💍</button>
 </div>
 
 <div class="final-page" id="finalPage">
@@ -672,6 +718,8 @@ const DEFAULT_CONFIG = {
   loveLetter: "",
   playerPhotoUrls: [],
   gallery: [],
+  memoryPhotos: [],
+  memoryWinMessage: "Cada foto dessas é um pedacinho da nossa história e eu quero guardar cada uma bem pertinho do coração! 🤍❤️",
   hangmanClue: "",
   hangmanWord: "Princesa",
   hangmanWinMessage: "Deus e Nossa Senhora mandou muito para mim uma princesa, uma que nem a Disney tem, te amo muito! 🥰❤️",
@@ -718,6 +766,8 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 function activeHeartsContainer(){
   const final = document.getElementById('finalPage');
   if (final && final.classList.contains('open')) return document.getElementById('finalPageHearts');
+  const memory = document.getElementById('memoryPage');
+  if (memory && memory.classList.contains('open')) return document.getElementById('memoryPageHearts');
   const hangman = document.getElementById('hangmanPage');
   if (hangman && hangman.classList.contains('open')) return document.getElementById('hangmanPageHearts');
   const gallery = document.getElementById('galleryPage');
@@ -1296,10 +1346,11 @@ hmNextBtn.addEventListener('click', () => {
 const finalPage = document.getElementById('finalPage');
 function openFinalPage(){
   hangmanPage.classList.remove('open');
+  memoryPage.classList.remove('open');
   finalPage.classList.add('open');
   setTimeout(burstConfetti, 350);
 }
-hmFinalBtn.addEventListener('click', openFinalPage);
+hmFinalBtn.addEventListener('click', openMemoryPage);
 
 function openHangmanPage(){
   hmInit();
@@ -1319,6 +1370,138 @@ document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') closeHangmanPage();
     else if (/^[a-zA-ZçÇáÁéÉíÍóÓúÚãÃõÕâÂêÊôÔ]$/.test(e.key)) hmGuess(e.key);
   }
+});
+
+/* ====================== Jogo da memória ====================== */
+const memoryPage = document.getElementById('memoryPage');
+const memoryGrid = document.getElementById('memoryGrid');
+const memoryCounter = document.getElementById('memoryCounter');
+const memoryStatusEl = document.getElementById('memoryStatus');
+const memoryStatusText = document.getElementById('memoryStatusText');
+const memoryFinalBtn = document.getElementById('memoryFinalBtn');
+const MEMORY_PAIRS = 6;
+// Combinações de fundo/símbolo bem distintas entre si, para o jogo continuar
+// jogável mesmo antes de fotos serem enviadas no admin.
+const MEMORY_PLACEHOLDERS = [
+  { bg:'#5c2a4d', fg:'#d9a95c', symbol:'♥' },
+  { bg:'#d9a95c', fg:'#2a1420', symbol:'♥' },
+  { bg:'#f4b8c7', fg:'#5c2a4d', symbol:'✦' },
+  { bg:'#1c0f22', fg:'#f4b8c7', symbol:'✦' },
+  { bg:'#faf1e4', fg:'#5c2a4d', symbol:'♥' },
+  { bg:'#8a4a6d', fg:'#faf1e4', symbol:'✦' }
+];
+
+let memDeck = [];
+let memFlipped = [];
+let memMatched = new Set();
+let memLocked = false;
+
+function memoryPlaceholder(i){
+  const p = MEMORY_PLACEHOLDERS[i % MEMORY_PLACEHOLDERS.length];
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="10" fill="${p.bg}"/><text x="50" y="66" font-size="46" text-anchor="middle" fill="${p.fg}">${p.symbol}</text></svg>`;
+  return 'data:image/svg+xml,' + encodeURIComponent(svg);
+}
+
+function memoryPhotoUrls(){
+  const urls = (CONFIG.memoryPhotos || []).slice(0, MEMORY_PAIRS);
+  while (urls.length < MEMORY_PAIRS) urls.push('');
+  return urls.map((url, i) => (url && url.trim()) ? url : memoryPlaceholder(i));
+}
+
+function shuffleArray(arr){
+  for (let i = arr.length - 1; i > 0; i--){
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function memoryInit(){
+  const photos = memoryPhotoUrls();
+  const pairs = photos.flatMap((url, i) => ([{ pairId: i, url }, { pairId: i, url }]));
+  memDeck = shuffleArray(pairs);
+  memFlipped = [];
+  memMatched = new Set();
+  memLocked = false;
+  memoryCounter.textContent = `0 / ${MEMORY_PAIRS} pares`;
+  memoryStatusEl.classList.remove('show', 'lost');
+  memoryFinalBtn.style.display = 'none';
+  memoryFinalBtn.classList.remove('show');
+  memoryRender();
+}
+
+function memoryRender(){
+  memoryGrid.innerHTML = '';
+  memDeck.forEach((card, idx) => {
+    const el = document.createElement('div');
+    el.className = 'memory-card';
+    el.dataset.idx = idx;
+    if (memMatched.has(idx)) el.classList.add('matched');
+    if (memFlipped.includes(idx)) el.classList.add('flipped');
+    el.innerHTML = `
+      <div class="memory-card-inner">
+        <div class="memory-card-face memory-card-back">♥</div>
+        <div class="memory-card-face memory-card-front"><img src="${card.url}" alt=""></div>
+      </div>`;
+    el.addEventListener('click', () => memoryFlip(idx));
+    memoryGrid.appendChild(el);
+  });
+}
+
+function memoryFlip(idx){
+  if (memLocked || memMatched.has(idx) || memFlipped.includes(idx) || memFlipped.length >= 2) return;
+  memFlipped.push(idx);
+  memoryRender();
+  if (memFlipped.length < 2) return;
+
+  memLocked = true;
+  const [a, b] = memFlipped;
+  if (memDeck[a].pairId === memDeck[b].pairId){
+    memMatched.add(a);
+    memMatched.add(b);
+    memFlipped = [];
+    memLocked = false;
+    memoryRender();
+    memoryCounter.textContent = `${memMatched.size / 2} / ${MEMORY_PAIRS} pares`;
+    memoryCheckWin();
+  } else {
+    const elA = memoryGrid.querySelector(`[data-idx="${a}"]`);
+    const elB = memoryGrid.querySelector(`[data-idx="${b}"]`);
+    if (elA) elA.classList.add('shake');
+    if (elB) elB.classList.add('shake');
+    setTimeout(() => {
+      memFlipped = [];
+      memLocked = false;
+      memoryRender();
+    }, 900);
+  }
+}
+
+function memoryCheckWin(){
+  if (memMatched.size !== MEMORY_PAIRS * 2) return;
+  burstConfetti();
+  memoryStatusText.textContent = CONFIG.memoryWinMessage || DEFAULT_CONFIG.memoryWinMessage;
+  memoryStatusEl.classList.add('show');
+  memoryFinalBtn.style.display = '';
+  requestAnimationFrame(() => memoryFinalBtn.classList.add('show'));
+}
+
+function openMemoryPage(){
+  hangmanPage.classList.remove('open');
+  memoryInit();
+  memoryPage.classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeMemoryPage(){
+  memoryPage.classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('memoryBack').addEventListener('click', closeMemoryPage);
+document.getElementById('memoryRestartBtn').addEventListener('click', memoryInit);
+memoryFinalBtn.addEventListener('click', openFinalPage);
+
+document.addEventListener('keydown', (e) => {
+  if (memoryPage.classList.contains('open') && e.key === 'Escape') closeMemoryPage();
 });
 
 loadConfig();
