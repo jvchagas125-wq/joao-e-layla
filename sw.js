@@ -1,7 +1,7 @@
 // Service worker mínimo — necessário para o navegador considerar o site "instalável".
 // Não faz cache agressivo, só garante que o app funcione offline no básico.
 
-const CACHE_NAME = "joao-layla-v2";
+const CACHE_NAME = "joao-layla-v3";
 
 self.addEventListener("install", (event) => {
   self.skipWaiting();

@@ -494,12 +494,108 @@
   .memory-card.matched{opacity:0.6;}
   .memory-card.matched .memory-card-front{box-shadow:0 0 0 2px var(--gold) inset;}
   .memory-card.shake .memory-card-inner{animation:hmShake 0.45s ease;}
+
+  /* ====================== Camada de efeitos (animações dos botões) ====================== */
+  #fxLayer{position:fixed; inset:0; pointer-events:none; z-index:300; overflow:hidden;}
+  .fx-heart{position:absolute; left:0; top:0; line-height:1; will-change:transform, opacity; user-select:none;}
+  .fx-light{
+    position:absolute; width:60px; height:60px; margin:-30px 0 0 -30px; border-radius:50%;
+    background:radial-gradient(circle, rgba(255,250,240,1) 0%, rgba(255,236,214,0.95) 22%, rgba(244,184,199,0.75) 45%, rgba(217,169,92,0.25) 65%, transparent 72%);
+    will-change:transform, opacity;
+  }
+  .fx-rays{
+    position:absolute; width:200vmax; height:200vmax; margin:-100vmax 0 0 -100vmax; border-radius:50%;
+    background:repeating-conic-gradient(from 0deg, rgba(255,240,220,0.22) 0deg 6deg, transparent 6deg 18deg);
+    -webkit-mask:radial-gradient(circle, #000 0%, rgba(0,0,0,0.6) 30%, transparent 62%);
+            mask:radial-gradient(circle, #000 0%, rgba(0,0,0,0.6) 30%, transparent 62%);
+    will-change:transform, opacity;
+  }
+  .fx-wipe{
+    position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(244,184,199,0.25), transparent),
+      linear-gradient(160deg, var(--wine), var(--night));
+  }
+  .fx-mini-card{
+    position:absolute; left:0; top:0; width:34px; height:46px; margin:-23px 0 0 -17px; border-radius:7px;
+    background:linear-gradient(160deg, var(--wine), var(--night)); border:1px solid rgba(217,169,92,0.5);
+    color:var(--gold); display:flex; align-items:center; justify-content:center; font-size:15px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.4); will-change:transform, opacity;
+  }
+  .fx-letter{
+    position:absolute; left:0; top:0; font-family:'Fraunces', serif; font-weight:600; color:var(--cream);
+    text-shadow:0 0 10px rgba(244,184,199,0.6); will-change:transform, opacity;
+  }
+  .fx-path{position:absolute; inset:0; width:100%; height:100%;}
+
+  /* ====================== Catálogo de jogos ====================== */
+  .games-page, .maze-page{
+    position:fixed; inset:0; z-index:96; overflow-y:auto;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -10%, rgba(244,184,199,0.15), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 100%, rgba(217,169,92,0.12), transparent),
+      linear-gradient(180deg, var(--night) 0%, var(--ink) 100%);
+    opacity:0; visibility:hidden; pointer-events:none;
+    transition:opacity 0.5s ease, visibility 0.5s;
+    display:flex; flex-direction:column; align-items:center; padding:90px 20px 60px;
+  }
+  .maze-page{z-index:99; padding:76px 16px 30px;}
+  .games-page.open, .maze-page.open{opacity:1; visibility:visible; pointer-events:auto;}
+  .games-grid{display:flex; flex-direction:column; gap:14px; width:100%; max-width:380px;}
+  .game-card{
+    position:relative; display:flex; align-items:center; gap:16px; width:100%; text-align:left;
+    background:linear-gradient(165deg, #2a1626, #1c0f1f); border:1px solid rgba(217,169,92,0.25);
+    border-radius:20px; padding:18px; color:var(--cream); cursor:pointer;
+    box-shadow:0 18px 40px rgba(0,0,0,0.4);
+    transition:transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .games-page.open .game-card{animation:gameCardIn 0.6s cubic-bezier(.22,.9,.24,1) backwards; animation-delay:var(--d, 0s);}
+  @keyframes gameCardIn{from{opacity:0; transform:translateY(18px);} to{opacity:1; transform:translateY(0);}}
+  .game-card:hover{border-color:rgba(217,169,92,0.55); box-shadow:0 18px 44px rgba(217,169,92,0.12);}
+  .game-card:active{transform:scale(0.97);}
+  .game-icon{
+    flex:0 0 auto; width:58px; height:58px; border-radius:16px; font-size:28px;
+    display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(140deg, rgba(217,169,92,0.22), rgba(244,184,199,0.16));
+    border:1px solid rgba(217,169,92,0.3);
+  }
+  .game-text{display:flex; flex-direction:column; gap:4px; min-width:0;}
+  .game-name{font-family:'Fraunces', serif; font-style:italic; font-weight:600; font-size:17px; color:var(--rose);}
+  .game-desc{font-size:12.5px; line-height:1.5; opacity:0.7;}
+  .game-done{
+    position:absolute; top:10px; right:12px; font-size:10px; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--gold); background:rgba(217,169,92,0.14); border:1px solid rgba(217,169,92,0.35);
+    padding:3px 8px; border-radius:999px; opacity:0; transform:scale(0.6); transition:opacity 0.4s ease, transform 0.4s cubic-bezier(.3,1.6,.5,1);
+  }
+  .game-card.done .game-done{opacity:1; transform:scale(1);}
+  .game-card.done .game-icon{box-shadow:0 0 18px rgba(217,169,92,0.3);}
+
+  /* ====================== Labirinto ====================== */
+  .maze-wrap{position:relative; margin:4px auto 0; border-radius:16px; overflow:hidden;
+    border:1px solid rgba(217,169,92,0.3); box-shadow:0 24px 60px rgba(0,0,0,0.5), 0 0 30px rgba(217,169,92,0.08);}
+  #mazeCanvas{display:block; touch-action:none;}
+  .maze-pad{display:grid; grid-template-columns:repeat(3, 52px); grid-template-rows:repeat(2, 46px); gap:8px; margin-top:18px; justify-content:center;}
+  .maze-pad button{
+    border-radius:14px; border:1px solid rgba(255,255,255,0.14); background:rgba(255,255,255,0.07);
+    color:var(--cream); font-size:18px; cursor:pointer; touch-action:manipulation; user-select:none; -webkit-user-select:none;
+    transition:transform 0.12s ease, background 0.2s ease;
+  }
+  .maze-pad button:active, .maze-pad button.pressed{transform:scale(0.9); background:rgba(217,169,92,0.25);}
+  .maze-pad .up{grid-column:2; grid-row:1;}
+  .maze-pad .left{grid-column:1; grid-row:2;}
+  .maze-pad .down{grid-column:2; grid-row:2;}
+  .maze-pad .right{grid-column:3; grid-row:2;}
+  .maze-hint{font-size:11px; opacity:0.45; margin:12px 0 0; text-align:center;}
+  .maze-status-title{display:block; font-size:20px; color:var(--rose); margin-bottom:8px;}
+  .maze-page .hm-status{margin-top:20px;}
+  .maze-page.won .maze-pad, .maze-page.won .maze-hint{display:none;}
 </style>
 </head>
 <body>
 
 <div id="heartsBg"></div>
 <div id="confettiLayer"></div>
+<div id="fxLayer"></div>
 
 <div id="entry">
   <div class="envelope-scene">
@@ -629,6 +725,67 @@
   <button class="letter-btn hangman-open-btn" id="hangmanBtn">Play Game ❤️🎮</button>
 </div>
 
+<div class="games-page" id="gamesPage">
+  <div class="page-hearts" id="gamesPageHearts"></div>
+  <button class="letter-page-back" id="gamesBack" aria-label="Voltar">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 4.5 8 12l7.5 7.5 1.4-1.4L10.8 12l6.1-6.1z"/></svg>
+    Voltar
+  </button>
+  <h2 class="hangman-title">Escolha um jogo 🎮</h2>
+  <p class="hangman-sub" id="gamesProgress">0 / 3 concluídos</p>
+  <div class="games-grid">
+    <button type="button" class="game-card" data-game="hangman" style="--d:0.05s;">
+      <span class="game-icon">🔤</span>
+      <span class="game-text">
+        <span class="game-name">Adivinhe a palavra</span>
+        <span class="game-desc">Descubra as palavras que eu escondi pra você, letra por letra.</span>
+      </span>
+      <span class="game-done">✓ feito</span>
+    </button>
+    <button type="button" class="game-card" data-game="memory" style="--d:0.15s;">
+      <span class="game-icon">🃏</span>
+      <span class="game-text">
+        <span class="game-name">Jogo da memória</span>
+        <span class="game-desc">Encontre os pares das nossas fotos.</span>
+      </span>
+      <span class="game-done">✓ feito</span>
+    </button>
+    <button type="button" class="game-card" data-game="maze" style="--d:0.25s;">
+      <span class="game-icon">🧭</span>
+      <span class="game-text">
+        <span class="game-name">Labirinto do amor</span>
+        <span class="game-desc">Guie a bonequinha pelo labirinto até encontrar a luz.</span>
+      </span>
+      <span class="game-done">✓ feito</span>
+    </button>
+  </div>
+  <button class="letter-btn hangman-open-btn" id="gamesFinalBtn" style="display:none;">Finalizar 💍</button>
+</div>
+
+<div class="maze-page" id="mazePage">
+  <div class="page-hearts" id="mazePageHearts"></div>
+  <button class="letter-page-back" id="mazeBack" aria-label="Voltar">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 4.5 8 12l7.5 7.5 1.4-1.4L10.8 12l6.1-6.1z"/></svg>
+    Voltar
+  </button>
+  <button class="hangman-restart-btn" id="mazeRestartBtn" aria-label="Novo labirinto">
+    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 5V2L7 7l5 5V8c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+    Novo
+  </button>
+  <h2 class="hangman-title">Labirinto do amor</h2>
+  <p class="hangman-sub">Leve a bonequinha até a luz ✦</p>
+  <div class="maze-wrap"><canvas id="mazeCanvas" aria-label="Labirinto"></canvas></div>
+  <div class="maze-pad" id="mazePad">
+    <button type="button" class="up" data-dir="up" aria-label="Cima">▲</button>
+    <button type="button" class="left" data-dir="left" aria-label="Esquerda">◀</button>
+    <button type="button" class="down" data-dir="down" aria-label="Baixo">▼</button>
+    <button type="button" class="right" data-dir="right" aria-label="Direita">▶</button>
+  </div>
+  <p class="maze-hint">Use as setas, deslize o dedo no labirinto ou segure os botões</p>
+  <div class="hm-status" id="mazeStatus"><span class="hm-status-heart">♥</span><span class="maze-status-title" id="mazeStatusTitle"></span><span id="mazeStatusText"></span></div>
+  <button class="letter-btn hangman-open-btn cw-final" id="mazeFinalBtn" style="display:none;">Escolher outro jogo 🎮</button>
+</div>
+
 <div class="hangman-page" id="hangmanPage">
   <div class="page-hearts" id="hangmanPageHearts"></div>
   <button class="letter-page-back" id="hangmanBack" aria-label="Voltar">
@@ -647,7 +804,7 @@
   <div class="hm-keyboard" id="hmKeyboard"></div>
   <div class="hm-status" id="hmStatus"><span class="hm-status-heart">♥</span><span id="hmStatusText"></span></div>
   <button class="letter-btn hangman-open-btn" id="hmNextBtn" style="display:none;">Próxima palavra🤭</button>
-  <button class="letter-btn hangman-open-btn cw-final" id="hmFinalBtn" style="display:none;">Mais um joguinho? 🧠</button>
+  <button class="letter-btn hangman-open-btn cw-final" id="hmFinalBtn" style="display:none;">Escolher outro jogo 🎮</button>
 </div>
 
 <div class="memory-page" id="memoryPage">
@@ -664,7 +821,7 @@
   <p class="hangman-sub" id="memoryCounter">0 / 6 pares</p>
   <div class="memory-grid" id="memoryGrid"></div>
   <div class="hm-status" id="memoryStatus"><span class="hm-status-heart">♥</span><span id="memoryStatusText"></span></div>
-  <button class="letter-btn hangman-open-btn cw-final" id="memoryFinalBtn" style="display:none;">Finalizar 💍</button>
+  <button class="letter-btn hangman-open-btn cw-final" id="memoryFinalBtn" style="display:none;">Escolher outro jogo 🎮</button>
 </div>
 
 <div class="final-page" id="finalPage">
@@ -672,7 +829,7 @@
   <div class="final-page-scroll">
     <div class="final-page-card">
       <div class="final-page-ring">💍</div>
-      <h2 class="final-page-title">Parabéns! Você descobriu<br>todas as palavras! 💕</h2>
+      <h2 class="final-page-title">Parabéns! Você completou<br>todos os jogos! 💕</h2>
       <div class="final-page-divider"></div>
       <p class="final-page-text">Obrigado por tudo meu amor eu te amo muitoooo!! Fiz isso aqui para você com muito amor e carinho!<br><br>Agora o próximo nível será em alguns anos... 💍🥹</p>
       <p class="final-page-continues">Continua...</p>
@@ -719,6 +876,9 @@ const DEFAULT_CONFIG = {
   playerPhotoUrls: [],
   gallery: [],
   memoryPhotos: [],
+  mazeSize: "medium",
+  mazeWinTitle: "Você me encontrou! 💛",
+  mazeWinMessage: "Não importa quantos caminhos difíceis apareçam, todos eles me levam até você. Em cada labirinto da vida, eu vou estar te esperando na luz do fim. Te amo! ❤️✨",
   memoryWinMessage: "Cada foto dessas é um pedacinho da nossa história e eu quero guardar cada uma bem pertinho do coração! 🤍❤️",
   hangmanClue: "",
   hangmanWord: "Princesa",
@@ -766,10 +926,14 @@ const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').match
 function activeHeartsContainer(){
   const final = document.getElementById('finalPage');
   if (final && final.classList.contains('open')) return document.getElementById('finalPageHearts');
+  const maze = document.getElementById('mazePage');
+  if (maze && maze.classList.contains('open')) return document.getElementById('mazePageHearts');
   const memory = document.getElementById('memoryPage');
   if (memory && memory.classList.contains('open')) return document.getElementById('memoryPageHearts');
   const hangman = document.getElementById('hangmanPage');
   if (hangman && hangman.classList.contains('open')) return document.getElementById('hangmanPageHearts');
+  const games = document.getElementById('gamesPage');
+  if (games && games.classList.contains('open')) return document.getElementById('gamesPageHearts');
   const gallery = document.getElementById('galleryPage');
   if (gallery && gallery.classList.contains('open')) return document.getElementById('galleryPageHearts');
   const letter = document.getElementById('letterPage');
@@ -856,9 +1020,9 @@ function openLetterPage(){
 }
 function closeLetterPage(){
   letterPage.classList.remove('open');
-  document.body.style.overflow = '';
+  syncBodyScroll();
 }
-document.getElementById('letterBtn').addEventListener('click', openLetterPage);
+document.getElementById('letterBtn').addEventListener('click', (e) => fxLetterHearts(e.currentTarget, openLetterPage));
 document.getElementById('letterPageBack').addEventListener('click', closeLetterPage);
 
 /* ====================== Galeria (álbum com efeito de virar página) ====================== */
@@ -929,9 +1093,12 @@ function openGalleryPage(){
 }
 function closeGalleryPage(){
   galleryPage.classList.remove('open');
-  document.body.style.overflow = '';
+  syncBodyScroll();
 }
-document.getElementById('galleryBtn').addEventListener('click', openGalleryPage);
+document.getElementById('galleryBtn').addEventListener('click', (e) => {
+  if (!galleryHasContent()) return;
+  fxGalleryLight(e.currentTarget, openGalleryPage);
+});
 document.getElementById('galleryBack').addEventListener('click', closeGalleryPage);
 document.getElementById('galleryNext').addEventListener('click', nextSlide);
 document.getElementById('galleryPrev').addEventListener('click', prevSlide);
@@ -948,11 +1115,11 @@ document.querySelector('.gallery-stage').addEventListener('touchend', (e) => {
 }, { passive: true });
 
 document.addEventListener('keydown', (e) => {
-  if (galleryPage.classList.contains('open')){
+  if (topOverlay() === galleryPage){
     if (e.key === 'Escape') closeGalleryPage();
     else if (e.key === 'ArrowRight') nextSlide();
     else if (e.key === 'ArrowLeft') prevSlide();
-  } else if (letterPage.classList.contains('open')){
+  } else if (topOverlay() === letterPage){
     if (e.key === 'Escape') closeLetterPage();
   }
 });
@@ -1355,10 +1522,13 @@ const finalPage = document.getElementById('finalPage');
 function openFinalPage(){
   hangmanPage.classList.remove('open');
   memoryPage.classList.remove('open');
+  document.getElementById('mazePage').classList.remove('open');
+  document.getElementById('gamesPage').classList.remove('open');
+  document.body.style.overflow = 'hidden';
   finalPage.classList.add('open');
   setTimeout(burstConfetti, 350);
 }
-hmFinalBtn.addEventListener('click', openMemoryPage);
+hmFinalBtn.addEventListener('click', () => { closeHangmanPage(); completeGame('hangman'); });
 
 function openHangmanPage(){
   hmInit();
@@ -1367,14 +1537,14 @@ function openHangmanPage(){
 }
 function closeHangmanPage(){
   hangmanPage.classList.remove('open');
-  document.body.style.overflow = '';
+  syncBodyScroll();
 }
-document.getElementById('hangmanBtn').addEventListener('click', openHangmanPage);
+document.getElementById('hangmanBtn').addEventListener('click', (e) => fxGameWipe(e.currentTarget, openGamesPage));
 document.getElementById('hangmanBack').addEventListener('click', closeHangmanPage);
 document.getElementById('hangmanRestartBtn').addEventListener('click', hmInit);
 
 document.addEventListener('keydown', (e) => {
-  if (hangmanPage.classList.contains('open')){
+  if (topOverlay() === hangmanPage){
     if (e.key === 'Escape') closeHangmanPage();
     else if (/^[a-zA-ZçÇáÁéÉíÍóÓúÚãÃõÕâÂêÊôÔ]$/.test(e.key)) hmGuess(e.key);
   }
@@ -1502,14 +1672,712 @@ function openMemoryPage(){
 }
 function closeMemoryPage(){
   memoryPage.classList.remove('open');
-  document.body.style.overflow = '';
+  syncBodyScroll();
 }
 document.getElementById('memoryBack').addEventListener('click', closeMemoryPage);
 document.getElementById('memoryRestartBtn').addEventListener('click', memoryInit);
-memoryFinalBtn.addEventListener('click', openFinalPage);
+memoryFinalBtn.addEventListener('click', () => { closeMemoryPage(); completeGame('memory'); });
 
 document.addEventListener('keydown', (e) => {
-  if (memoryPage.classList.contains('open') && e.key === 'Escape') closeMemoryPage();
+  if (topOverlay() === memoryPage && e.key === 'Escape') closeMemoryPage();
+});
+
+/* ====================== Overlays: qual tela está por cima ====================== */
+const OVERLAY_ORDER = ['finalPage', 'memoryPage', 'mazePage', 'hangmanPage', 'gamesPage', 'galleryPage', 'letterPage'];
+function topOverlay(){
+  for (const id of OVERLAY_ORDER){
+    const el = document.getElementById(id);
+    if (el && el.classList.contains('open')) return el;
+  }
+  return null;
+}
+function syncBodyScroll(){
+  document.body.style.overflow = topOverlay() ? 'hidden' : '';
+}
+
+/* ====================== Efeitos dos botões ====================== */
+const fxLayer = document.getElementById('fxLayer');
+const FX_COLORS = ['#f4b8c7', '#d9a95c', '#faf1e4', '#ff8fab'];
+let fxBusy = false;
+const rand = (a, b) => a + Math.random() * (b - a);
+
+function centerOf(el){
+  const r = el.getBoundingClientRect();
+  return { x: r.left + r.width / 2, y: r.top + r.height / 2, w: r.width, h: r.height };
+}
+function fxEl(cls, text){
+  const el = document.createElement('div');
+  el.className = cls;
+  if (text != null) el.textContent = text;
+  fxLayer.appendChild(el);
+  return el;
+}
+function fxStart(done){
+  if (reduceMotion){ done(); return false; }
+  if (fxBusy) return false;
+  fxBusy = true;
+  return true;
+}
+function fxEnd(ms){ setTimeout(() => { fxBusy = false; }, ms); }
+
+// "Uma cartinha para você": coraçõezinhos subindo
+function fxLetterHearts(btn, done){
+  if (!fxStart(done)) return;
+  const c = centerOf(btn);
+  const H = window.innerHeight;
+  btn.animate([
+    { transform:'scale(1)' }, { transform:'scale(1.12)' }, { transform:'scale(0.95)' }, { transform:'scale(1)' }
+  ], { duration:520, easing:'ease-out' });
+  for (let i = 0; i < 36; i++){
+    const el = fxEl('fx-heart', Math.random() < 0.82 ? '♥' : '✦');
+    el.style.color = FX_COLORS[i % FX_COLORS.length];
+    el.style.fontSize = rand(9, 21) + 'px';
+    const sx = c.x + rand(-c.w / 2, c.w / 2);
+    const sy = c.y + rand(-8, 8);
+    const rise = rand(H * 0.5, H * 1.0);
+    const sway = rand(16, 42) * (Math.random() < 0.5 ? -1 : 1);
+    el.animate([
+      { transform:`translate(${sx}px, ${sy}px) scale(0.2)`, opacity:0 },
+      { transform:`translate(${sx + sway * 0.5}px, ${sy - rise * 0.15}px) scale(1)`, opacity:1, offset:0.12 },
+      { transform:`translate(${sx - sway}px, ${sy - rise * 0.55}px) scale(1) rotate(${-sway / 2}deg)`, opacity:0.9, offset:0.55 },
+      { transform:`translate(${sx + sway}px, ${sy - rise}px) scale(0.8) rotate(${sway / 2}deg)`, opacity:0 }
+    ], { duration:rand(1500, 2500), delay:rand(0, 450), easing:'cubic-bezier(.2,.6,.4,1)', fill:'both' })
+      .onfinish = () => el.remove();
+  }
+  setTimeout(done, 750);
+  fxEnd(900);
+}
+
+// "Ver galeria": explosão de luz com corações
+function fxGalleryLight(btn, done){
+  if (!fxStart(done)) return;
+  const c = centerOf(btn);
+  const cover = Math.hypot(window.innerWidth, window.innerHeight) / 18;
+
+  const rays = fxEl('fx-rays');
+  rays.style.left = c.x + 'px'; rays.style.top = c.y + 'px';
+  rays.animate([
+    { transform:'scale(0.05) rotate(0deg)', opacity:0 },
+    { transform:'scale(0.55) rotate(35deg)', opacity:1, offset:0.4 },
+    { transform:'scale(1) rotate(80deg)', opacity:0 }
+  ], { duration:1600, easing:'ease-out', fill:'both' }).onfinish = () => rays.remove();
+
+  const light = fxEl('fx-light');
+  light.style.left = c.x + 'px'; light.style.top = c.y + 'px';
+  light.animate([
+    { transform:'scale(0.2)', opacity:0 },
+    { transform:'scale(1.6)', opacity:1, offset:0.18 },
+    { transform:`scale(${cover})`, opacity:1, offset:0.55 },
+    { transform:`scale(${cover})`, opacity:0 }
+  ], { duration:1600, easing:'ease-in-out', fill:'both' }).onfinish = () => light.remove();
+
+  for (let i = 0; i < 28; i++){
+    const el = fxEl('fx-heart', i % 4 === 0 ? '✦' : '♥');
+    el.style.color = FX_COLORS[i % FX_COLORS.length];
+    el.style.fontSize = rand(12, 26) + 'px';
+    const ang = (i / 28) * Math.PI * 2 + rand(-0.15, 0.15);
+    const d = rand(110, 280);
+    el.animate([
+      { transform:`translate(${c.x}px, ${c.y}px) scale(0.2)`, opacity:0 },
+      { transform:`translate(${c.x + Math.cos(ang) * d * 0.6}px, ${c.y + Math.sin(ang) * d * 0.6}px) scale(1.2)`, opacity:1, offset:0.4 },
+      { transform:`translate(${c.x + Math.cos(ang) * d}px, ${c.y + Math.sin(ang) * d}px) scale(0.7)`, opacity:0 }
+    ], { duration:rand(1000, 1400), easing:'cubic-bezier(.15,.7,.3,1)', fill:'both' }).onfinish = () => el.remove();
+  }
+
+  // a galeria abre no pico do clarão
+  setTimeout(() => {
+    done();
+    // segunda onda: coraçõezinhos caindo suavemente sobre a galeria
+    for (let i = 0; i < 16; i++){
+      const el = fxEl('fx-heart', '♥');
+      el.style.color = FX_COLORS[i % FX_COLORS.length];
+      el.style.fontSize = rand(10, 18) + 'px';
+      const x = rand(0, window.innerWidth);
+      const fall = rand(window.innerHeight * 0.4, window.innerHeight * 0.9);
+      el.animate([
+        { transform:`translate(${x}px, -20px) rotate(0deg)`, opacity:0 },
+        { opacity:0.9, offset:0.2 },
+        { transform:`translate(${x + rand(-40, 40)}px, ${fall}px) rotate(${rand(-60, 60)}deg)`, opacity:0 }
+      ], { duration:rand(1800, 2800), delay:rand(0, 600), easing:'ease-out', fill:'both' }).onfinish = () => el.remove();
+    }
+  }, 860);
+  fxEnd(1650);
+}
+
+// "Play Game": controle vibrando + transição circular com ícones em espiral
+function fxGameWipe(btn, done){
+  if (!fxStart(done)) return;
+  const c = centerOf(btn);
+  btn.animate([
+    { transform:'translateX(0)' }, { transform:'translateX(-4px) rotate(-2deg)' }, { transform:'translateX(4px) rotate(2deg)' },
+    { transform:'translateX(-3px)' }, { transform:'translateX(3px)' }, { transform:'translateX(0)' }
+  ], { duration:340, easing:'linear' });
+
+  const R = Math.hypot(Math.max(c.x, window.innerWidth - c.x), Math.max(c.y, window.innerHeight - c.y)) + 20;
+  const wipe = fxEl('fx-wipe');
+  wipe.animate([
+    { clipPath:`circle(0px at ${c.x}px ${c.y}px)` },
+    { clipPath:`circle(${R}px at ${c.x}px ${c.y}px)` }
+  ], { duration:720, delay:260, easing:'cubic-bezier(.7,0,.3,1)', fill:'both' });
+
+  const icons = ['🎮', '❤️', '⭐', '✦', '💕', '🕹️'];
+  for (let i = 0; i < 18; i++){
+    const el = fxEl('fx-heart', icons[i % icons.length]);
+    el.style.fontSize = rand(16, 28) + 'px';
+    el.style.color = FX_COLORS[i % FX_COLORS.length];
+    const a0 = (i / 18) * Math.PI * 2;
+    const d = rand(140, 300);
+    const pt = (k, dist) => `translate(${c.x + Math.cos(a0 + k) * dist}px, ${c.y + Math.sin(a0 + k) * dist}px)`;
+    el.animate([
+      { transform:`${pt(0, 0)} scale(0.2) rotate(0deg)`, opacity:0 },
+      { transform:`${pt(0.7, d * 0.45)} scale(1.1) rotate(120deg)`, opacity:1, offset:0.35 },
+      { transform:`${pt(1.4, d)} scale(0.6) rotate(260deg)`, opacity:0 }
+    ], { duration:rand(1000, 1300), delay:150, easing:'cubic-bezier(.2,.7,.3,1)', fill:'both' }).onfinish = () => el.remove();
+  }
+
+  setTimeout(() => {
+    done();
+    wipe.animate([{ opacity:1 }, { opacity:0 }], { duration:480, fill:'both' }).onfinish = () => wipe.remove();
+  }, 1000);
+  fxEnd(1500);
+}
+
+// Catálogo — "Adivinhe a palavra": letras explodindo
+function fxGameLetters(card, done){
+  if (!fxStart(done)) return;
+  const c = centerOf(card);
+  card.animate([{ transform:'scale(1)' }, { transform:'scale(1.05)' }, { transform:'scale(1)' }], { duration:420, easing:'ease-out' });
+  const letters = 'AMORBEIJOCARINHOTEAMO'.split('');
+  const far = Math.max(window.innerWidth, window.innerHeight) * 0.6;
+  letters.forEach((ch, i) => {
+    const el = fxEl('fx-letter', ch);
+    el.style.fontSize = rand(16, 32) + 'px';
+    if (i % 3 === 0) el.style.color = '#f4b8c7';
+    if (i % 5 === 0) el.style.color = '#d9a95c';
+    const ang = rand(0, Math.PI * 2), d = rand(120, far);
+    el.animate([
+      { transform:`translate(${c.x}px, ${c.y}px) scale(0.3) rotate(0deg)`, opacity:0 },
+      { opacity:1, offset:0.2 },
+      { transform:`translate(${c.x + Math.cos(ang) * d}px, ${c.y + Math.sin(ang) * d}px) scale(1.1) rotate(${rand(-220, 220)}deg)`, opacity:0 }
+    ], { duration:rand(900, 1300), delay:i * 22, easing:'cubic-bezier(.15,.7,.3,1)', fill:'both' }).onfinish = () => el.remove();
+  });
+  setTimeout(done, 900);
+  fxEnd(1100);
+}
+
+// Catálogo — "Jogo da memória": card vira e cartinhas se espalham em leque
+function fxGameCards(card, done){
+  if (!fxStart(done)) return;
+  const c = centerOf(card);
+  card.animate([
+    { transform:'perspective(700px) rotateY(0deg)' },
+    { transform:'perspective(700px) rotateY(180deg) scale(1.04)' },
+    { transform:'perspective(700px) rotateY(360deg)' }
+  ], { duration:820, easing:'ease-in-out' });
+  const N = 8, R = Math.min(170, window.innerWidth * 0.4);
+  for (let i = 0; i < N; i++){
+    const el = fxEl('fx-mini-card', i % 2 ? '♥' : '✦');
+    const a = (-70 + (140 / (N - 1)) * i) * Math.PI / 180;
+    const tx = c.x + Math.sin(a) * R, ty = c.y - Math.cos(a) * R;
+    const deg = a * 180 / Math.PI;
+    el.animate([
+      { transform:`translate(${c.x}px, ${c.y}px) scale(0.4) rotate(0deg)`, opacity:0 },
+      { transform:`translate(${tx}px, ${ty}px) scale(1) rotate(${deg}deg) rotateY(0deg)`, opacity:1, offset:0.45 },
+      { transform:`translate(${tx}px, ${ty}px) scale(1) rotate(${deg}deg) rotateY(180deg)`, opacity:1, offset:0.7 },
+      { transform:`translate(${c.x}px, ${c.y - 40}px) scale(0.3) rotate(${deg * 2}deg)`, opacity:0 }
+    ], { duration:1150, delay:i * 30, easing:'cubic-bezier(.3,.7,.3,1)', fill:'both' }).onfinish = () => el.remove();
+  }
+  setTimeout(done, 1000);
+  fxEnd(1200);
+}
+
+// Catálogo — "Labirinto": um caminho de luz se desenha até um clarão
+function fxGamePath(card, done){
+  if (!fxStart(done)) return;
+  const c = centerOf(card);
+  const W = window.innerWidth, H = window.innerHeight;
+  const tx = W / 2, ty = H * 0.16;
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('class', 'fx-path');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  let x = c.x, y = c.y;
+  const pts = [[x, y]];
+  const steps = 6;
+  for (let k = 0; k < steps; k++){
+    if (k % 2 === 0) x = rand(W * 0.12, W * 0.88);
+    else y = y - (c.y - ty) / (steps / 2);
+    pts.push([x, y]);
+  }
+  pts.push([tx, y]); pts.push([tx, ty]);
+  const path = document.createElementNS(NS, 'polyline');
+  path.setAttribute('points', pts.map(p => p.join(',')).join(' '));
+  path.setAttribute('fill', 'none');
+  path.setAttribute('stroke', '#d9a95c');
+  path.setAttribute('stroke-width', '3');
+  path.setAttribute('stroke-linecap', 'round');
+  path.setAttribute('stroke-linejoin', 'round');
+  path.style.filter = 'drop-shadow(0 0 6px rgba(217,169,92,0.9))';
+  svg.appendChild(path);
+  fxLayer.appendChild(svg);
+  let len = 0;
+  for (let i = 1; i < pts.length; i++) len += Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+  path.style.strokeDasharray = len;
+  path.style.strokeDashoffset = len;
+  path.animate([{ strokeDashoffset:len }, { strokeDashoffset:0 }], { duration:800, easing:'ease-in-out', fill:'forwards' });
+  card.animate([{ boxShadow:'0 0 0 rgba(217,169,92,0)' }, { boxShadow:'0 0 30px rgba(217,169,92,0.6)' }, { boxShadow:'0 0 0 rgba(217,169,92,0)' }], { duration:900 });
+
+  // um coraçãozinho percorre o caminho
+  const walker = fxEl('fx-heart', '♥');
+  walker.style.color = '#f4b8c7';
+  walker.style.fontSize = '18px';
+  const t0 = performance.now();
+  (function step(now){
+    const t = Math.min(1, (now - t0) / 800);
+    const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    let target = e * len, acc = 0, px = pts[0][0], py = pts[0][1];
+    for (let i = 1; i < pts.length; i++){
+      const seg = Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]);
+      if (acc + seg >= target){
+        const f = seg ? (target - acc) / seg : 0;
+        px = pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * f;
+        py = pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * f;
+        break;
+      }
+      acc += seg; px = pts[i][0]; py = pts[i][1];
+    }
+    walker.style.transform = `translate(${px - 7}px, ${py - 10}px)`;
+    if (t < 1) requestAnimationFrame(step);
+    else walker.remove();
+  })(t0);
+
+  setTimeout(() => {
+    const light = fxEl('fx-light');
+    light.style.left = tx + 'px'; light.style.top = ty + 'px';
+    const cover = Math.hypot(W, H) / 16;
+    light.animate([
+      { transform:'scale(0.3)', opacity:0 },
+      { transform:'scale(3)', opacity:1, offset:0.25 },
+      { transform:`scale(${cover})`, opacity:1, offset:0.6 },
+      { transform:`scale(${cover})`, opacity:0 }
+    ], { duration:1200, easing:'ease-in-out', fill:'both' }).onfinish = () => light.remove();
+    setTimeout(() => { done(); }, 620);
+    svg.animate([{ opacity:1 }, { opacity:0 }], { duration:500, delay:400, fill:'both' }).onfinish = () => svg.remove();
+  }, 800);
+  fxEnd(2100);
+}
+
+/* ====================== Catálogo de jogos ====================== */
+const gamesPage = document.getElementById('gamesPage');
+const completedGames = new Set();
+
+function refreshGamesPage(){
+  gamesPage.querySelectorAll('.game-card').forEach(card => {
+    card.classList.toggle('done', completedGames.has(card.dataset.game));
+  });
+  document.getElementById('gamesProgress').textContent = `${completedGames.size} / 3 concluídos`;
+  document.getElementById('gamesFinalBtn').style.display = completedGames.size >= 3 ? '' : 'none';
+}
+function openGamesPage(){
+  refreshGamesPage();
+  gamesPage.classList.add('open');
+  gamesPage.scrollTop = 0;
+  syncBodyScroll();
+}
+function closeGamesPage(){
+  gamesPage.classList.remove('open');
+  syncBodyScroll();
+}
+function completeGame(id){
+  const isNew = !completedGames.has(id);
+  completedGames.add(id);
+  refreshGamesPage();
+  if (isNew && !reduceMotion){
+    const card = gamesPage.querySelector(`[data-game="${id}"]`);
+    if (card) card.animate([
+      { boxShadow:'0 18px 40px rgba(0,0,0,0.4)' },
+      { boxShadow:'0 0 34px rgba(217,169,92,0.55)' },
+      { boxShadow:'0 18px 40px rgba(0,0,0,0.4)' }
+    ], { duration:1100, delay:300 });
+    if (completedGames.size >= 3) setTimeout(burstConfetti, 400);
+  }
+}
+document.getElementById('gamesBack').addEventListener('click', closeGamesPage);
+document.getElementById('gamesFinalBtn').addEventListener('click', openFinalPage);
+
+const GAME_OPENERS = { hangman: () => openHangmanPage(), memory: () => openMemoryPage(), maze: () => openMazePage() };
+const GAME_FX = { hangman: fxGameLetters, memory: fxGameCards, maze: fxGamePath };
+gamesPage.querySelectorAll('.game-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const id = card.dataset.game;
+    GAME_FX[id](card, GAME_OPENERS[id]);
+  });
+});
+document.addEventListener('keydown', (e) => {
+  if (topOverlay() === gamesPage && e.key === 'Escape') closeGamesPage();
+});
+
+/* ====================== Labirinto do amor ====================== */
+const mazePage = document.getElementById('mazePage');
+const mazeCanvas = document.getElementById('mazeCanvas');
+const mctx = mazeCanvas.getContext('2d');
+const mazeStatusEl = document.getElementById('mazeStatus');
+const mazeFinalBtn = document.getElementById('mazeFinalBtn');
+const MAZE_SIZES = { small:[7, 9], medium:[9, 12], large:[11, 15] };
+const MOVE_MS = 120;
+const DIR_VEC = { up:[0, -1, 0], right:[1, 0, 1], down:[0, 1, 2], left:[-1, 0, 3] };
+const OPPOSITE = { up:'down', down:'up', left:'right', right:'left' };
+let mz = null;
+let mazeRaf = null;
+
+function generateMaze(cols, rows){
+  // paredes de cada célula: [cima, direita, baixo, esquerda]
+  const walls = Array.from({ length: rows * cols }, () => [true, true, true, true]);
+  const seen = new Uint8Array(rows * cols);
+  const stack = [0];
+  seen[0] = 1;
+  const DIRS = [[0, -1, 0, 2], [1, 0, 1, 3], [0, 1, 2, 0], [-1, 0, 3, 1]];
+  while (stack.length){
+    const cur = stack[stack.length - 1];
+    const cx = cur % cols, cy = Math.floor(cur / cols);
+    const opts = [];
+    DIRS.forEach(([dx, dy, w, ow]) => {
+      const nx = cx + dx, ny = cy + dy;
+      if (nx >= 0 && ny >= 0 && nx < cols && ny < rows && !seen[ny * cols + nx]) opts.push([ny * cols + nx, w, ow]);
+    });
+    if (!opts.length){ stack.pop(); continue; }
+    const [n, w, ow] = opts[Math.floor(Math.random() * opts.length)];
+    walls[cur][w] = false;
+    walls[n][ow] = false;
+    seen[n] = 1;
+    stack.push(n);
+  }
+  return walls;
+}
+
+function mazeLayout(){
+  if (!mz) return;
+  const maxW = Math.min(window.innerWidth - 32, 420);
+  const maxH = window.innerHeight - 330;
+  const cell = Math.max(20, Math.floor(Math.min(maxW / mz.cols, maxH / mz.rows)));
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  mz.cell = cell;
+  mazeCanvas.width = mz.cols * cell * dpr;
+  mazeCanvas.height = mz.rows * cell * dpr;
+  mazeCanvas.style.width = mz.cols * cell + 'px';
+  mazeCanvas.style.height = mz.rows * cell + 'px';
+  mctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function mazeInit(){
+  const [cols, rows] = MAZE_SIZES[CONFIG.mazeSize] || MAZE_SIZES.medium;
+  mz = {
+    cols, rows, cell:30, walls: generateMaze(cols, rows),
+    pc:0, pr:0, x:0.5, y:0.5, fromX:0.5, fromY:0.5,
+    moving:false, moveStart:0, lastDir:null, nextDir:null, auto:false,
+    goal:{ c:cols - 1, r:rows - 1 }, trail:[{ c:0, r:0 }],
+    bump:null, won:false, winStart:0
+  };
+  mazeLayout();
+  mazePage.classList.remove('won');
+  mazeStatusEl.classList.remove('show');
+  mazeFinalBtn.style.display = 'none';
+  mazeFinalBtn.classList.remove('show');
+}
+
+function mazeCanMove(c, r, dir){
+  return !mz.walls[r * mz.cols + c][DIR_VEC[dir][2]];
+}
+function mazeTryMove(dir){
+  if (!mz || mz.won) return false;
+  if (mz.moving){ mz.nextDir = dir; return false; }
+  if (!mazeCanMove(mz.pc, mz.pr, dir)){
+    mz.bump = { dir, t: performance.now() };
+    mz.auto = false;
+    return false;
+  }
+  const [dx, dy] = DIR_VEC[dir];
+  mz.fromX = mz.pc + 0.5; mz.fromY = mz.pr + 0.5;
+  mz.pc += dx; mz.pr += dy;
+  mz.moving = true;
+  mz.moveStart = performance.now();
+  mz.lastDir = dir;
+  const last = mz.trail[mz.trail.length - 1];
+  if (!last || last.c !== mz.pc || last.r !== mz.pr) mz.trail.push({ c:mz.pc, r:mz.pr });
+  if (mz.trail.length > 80) mz.trail.shift();
+  return true;
+}
+function mazeArrived(){
+  if (mz.pc === mz.goal.c && mz.pr === mz.goal.r){ mazeWin(); return; }
+  if (mz.auto){
+    // deslizar o dedo segue o corredor sozinho até uma bifurcação
+    const back = OPPOSITE[mz.lastDir];
+    const opens = Object.keys(DIR_VEC).filter(d => d !== back && mazeCanMove(mz.pc, mz.pr, d));
+    if (opens.length === 1 && !mz.nextDir){ mazeTryMove(opens[0]); return; }
+    mz.auto = false;
+  }
+  if (mz.nextDir){
+    const d = mz.nextDir;
+    mz.nextDir = null;
+    mazeTryMove(d);
+  }
+}
+function mazeWin(){
+  mz.won = true;
+  mz.auto = false;
+  mz.nextDir = null;
+  mz.winStart = performance.now();
+  mazePage.classList.add('won');
+  setTimeout(() => {
+    if (!mazePage.classList.contains('open')) return;
+    burstConfetti();
+    document.getElementById('mazeStatusTitle').textContent = CONFIG.mazeWinTitle || DEFAULT_CONFIG.mazeWinTitle;
+    document.getElementById('mazeStatusText').textContent = CONFIG.mazeWinMessage || DEFAULT_CONFIG.mazeWinMessage;
+    mazeStatusEl.classList.add('show');
+    mazeFinalBtn.style.display = '';
+    requestAnimationFrame(() => mazeFinalBtn.classList.add('show'));
+    setTimeout(() => mazeStatusEl.scrollIntoView({ behavior:'smooth', block:'center' }), 200);
+  }, 1300);
+}
+
+function drawGirl(x, y, s, now){
+  const bob = Math.sin(now / 220) * s * 0.025;
+  mctx.save();
+  mctx.translate(x, y + bob);
+  const r = s * 0.15;
+  // vestido
+  mctx.fillStyle = '#f4b8c7';
+  mctx.beginPath();
+  mctx.moveTo(-s * 0.2, s * 0.32);
+  mctx.quadraticCurveTo(0, s * 0.37, s * 0.2, s * 0.32);
+  mctx.lineTo(s * 0.07, -s * 0.01);
+  mctx.lineTo(-s * 0.07, -s * 0.01);
+  mctx.closePath();
+  mctx.fill();
+  // cabelo atrás (comprido)
+  mctx.fillStyle = '#4a2318';
+  mctx.beginPath();
+  mctx.ellipse(0, -s * 0.16, r * 1.1, r * 0.98, 0, 0, Math.PI * 2);
+  mctx.fill();
+  mctx.beginPath();
+  mctx.roundRect ? mctx.roundRect(-r * 1.1, -s * 0.16, r * 0.42, r * 1.45, r * 0.2) : mctx.rect(-r * 1.1, -s * 0.16, r * 0.42, r * 1.45);
+  mctx.roundRect ? mctx.roundRect(r * 0.68, -s * 0.16, r * 0.42, r * 1.45, r * 0.2) : mctx.rect(r * 0.68, -s * 0.16, r * 0.42, r * 1.45);
+  mctx.fill();
+  // rosto
+  mctx.fillStyle = '#f6d3b3';
+  mctx.beginPath();
+  mctx.arc(0, -s * 0.13, r * 0.88, 0, Math.PI * 2);
+  mctx.fill();
+  // franja
+  mctx.fillStyle = '#4a2318';
+  mctx.beginPath();
+  mctx.arc(0, -s * 0.17, r * 0.9, Math.PI * 1.05, Math.PI * 1.95);
+  mctx.fill();
+  // olhinhos e bochechas
+  mctx.fillStyle = '#2a1420';
+  mctx.beginPath(); mctx.arc(-r * 0.32, -s * 0.12, Math.max(1, s * 0.022), 0, Math.PI * 2); mctx.fill();
+  mctx.beginPath(); mctx.arc(r * 0.32, -s * 0.12, Math.max(1, s * 0.022), 0, Math.PI * 2); mctx.fill();
+  mctx.fillStyle = 'rgba(255,120,150,0.45)';
+  mctx.beginPath(); mctx.arc(-r * 0.55, -s * 0.07, s * 0.03, 0, Math.PI * 2); mctx.fill();
+  mctx.beginPath(); mctx.arc(r * 0.55, -s * 0.07, s * 0.03, 0, Math.PI * 2); mctx.fill();
+  // lacinho
+  mctx.fillStyle = '#d9a95c';
+  mctx.font = `${s * 0.16}px serif`;
+  mctx.textAlign = 'center';
+  mctx.textBaseline = 'middle';
+  mctx.fillText('♥', r * 0.75, -s * 0.27);
+  mctx.restore();
+}
+
+function mazeDraw(now){
+  if (!mz) return;
+  const { cols, rows, cell } = mz;
+  const W = cols * cell, H = rows * cell;
+
+  if (mz.moving){
+    let t = (now - mz.moveStart) / MOVE_MS;
+    if (t >= 1){ t = 1; mz.moving = false; }
+    const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    mz.x = mz.fromX + (mz.pc + 0.5 - mz.fromX) * e;
+    mz.y = mz.fromY + (mz.pr + 0.5 - mz.fromY) * e;
+    if (!mz.moving) mazeArrived();
+  } else {
+    mz.x = mz.pc + 0.5;
+    mz.y = mz.pr + 0.5;
+  }
+
+  mctx.clearRect(0, 0, W, H);
+  mctx.fillStyle = '#170b1c';
+  mctx.fillRect(0, 0, W, H);
+
+  // rastro de coraçõezinhos
+  mctx.textAlign = 'center';
+  mctx.textBaseline = 'middle';
+  mctx.font = `${cell * 0.26}px serif`;
+  const n = mz.trail.length;
+  mz.trail.forEach((p, i) => {
+    if (i === n - 1) return;
+    mctx.fillStyle = `rgba(244,184,199,${0.08 + 0.4 * (i / n)})`;
+    mctx.fillText('♥', (p.c + 0.5) * cell, (p.r + 0.5) * cell);
+  });
+
+  // paredes
+  mctx.save();
+  mctx.strokeStyle = '#d9a95c';
+  mctx.lineWidth = Math.max(2, cell * 0.09);
+  mctx.lineCap = 'round';
+  mctx.shadowColor = 'rgba(217,169,92,0.55)';
+  mctx.shadowBlur = 6;
+  mctx.beginPath();
+  for (let r = 0; r < rows; r++){
+    for (let c = 0; c < cols; c++){
+      const w = mz.walls[r * cols + c];
+      const x = c * cell, y = r * cell;
+      if (w[0]){ mctx.moveTo(x, y); mctx.lineTo(x + cell, y); }
+      if (w[3]){ mctx.moveTo(x, y); mctx.lineTo(x, y + cell); }
+      if (c === cols - 1 && w[1]){ mctx.moveTo(x + cell, y); mctx.lineTo(x + cell, y + cell); }
+      if (r === rows - 1 && w[2]){ mctx.moveTo(x, y + cell); mctx.lineTo(x + cell, y + cell); }
+    }
+  }
+  mctx.stroke();
+  mctx.restore();
+
+  // névoa: só fica bem visível ao redor da bonequinha
+  let px = mz.x * cell, py = mz.y * cell;
+  const fog = mctx.createRadialGradient(px, py, cell * 1.3, px, py, cell * 4.4);
+  fog.addColorStop(0, 'rgba(23,11,28,0)');
+  fog.addColorStop(1, 'rgba(23,11,28,0.8)');
+  mctx.fillStyle = fog;
+  mctx.fillRect(0, 0, W, H);
+
+  // a luz no fim do labirinto
+  const gx = (mz.goal.c + 0.5) * cell, gy = (mz.goal.r + 0.5) * cell;
+  const pulse = 1 + 0.14 * Math.sin(now / 320);
+  const gr = cell * 1.4 * pulse;
+  const gl = mctx.createRadialGradient(gx, gy, 0, gx, gy, gr);
+  gl.addColorStop(0, 'rgba(255,252,240,1)');
+  gl.addColorStop(0.22, 'rgba(255,230,190,0.92)');
+  gl.addColorStop(0.55, 'rgba(244,184,199,0.35)');
+  gl.addColorStop(1, 'rgba(244,184,199,0)');
+  mctx.fillStyle = gl;
+  mctx.fillRect(gx - gr, gy - gr, gr * 2, gr * 2);
+  mctx.fillStyle = '#ffffff';
+  mctx.font = `${cell * 0.4}px serif`;
+  mctx.fillText('✦', gx, gy);
+
+  // brilho em volta da bonequinha
+  const halo = mctx.createRadialGradient(px, py, 0, px, py, cell * 0.8);
+  halo.addColorStop(0, 'rgba(255,230,200,0.28)');
+  halo.addColorStop(1, 'rgba(255,230,200,0)');
+  mctx.fillStyle = halo;
+  mctx.fillRect(px - cell, py - cell, cell * 2, cell * 2);
+
+  // "esbarrou" na parede
+  if (mz.bump){
+    const bt = (now - mz.bump.t) / 180;
+    if (bt >= 1) mz.bump = null;
+    else {
+      const k = Math.sin(bt * Math.PI) * cell * 0.1;
+      const [dx, dy] = DIR_VEC[mz.bump.dir];
+      px += dx * k; py += dy * k;
+    }
+  }
+  drawGirl(px, py, cell, now);
+
+  // clarão de vitória
+  if (mz.won){
+    const t = Math.min(1, (now - mz.winStart) / 1600);
+    const R = cell * 1.4 + t * Math.hypot(W, H);
+    const alpha = t < 0.55 ? t / 0.55 : 1 - ((t - 0.55) / 0.45) * 0.7;
+    const wl = mctx.createRadialGradient(gx, gy, 0, gx, gy, R);
+    wl.addColorStop(0, `rgba(255,250,238,${alpha})`);
+    wl.addColorStop(0.6, `rgba(255,224,190,${alpha * 0.85})`);
+    wl.addColorStop(1, `rgba(244,184,199,${alpha * 0.4})`);
+    mctx.fillStyle = wl;
+    mctx.fillRect(0, 0, W, H);
+    if (t >= 1){
+      mctx.fillStyle = 'rgba(42,20,32,0.85)';
+      mctx.font = `${cell * 1.6}px serif`;
+      mctx.fillText('♥', W / 2, H / 2 + Math.sin(now / 300) * 4);
+    }
+  }
+}
+
+function mazeLoop(now){
+  mazeDraw(now);
+  mazeRaf = requestAnimationFrame(mazeLoop);
+}
+function openMazePage(){
+  mazeInit();
+  mazePage.classList.add('open');
+  mazePage.scrollTop = 0;
+  syncBodyScroll();
+  cancelAnimationFrame(mazeRaf);
+  mazeRaf = requestAnimationFrame(mazeLoop);
+}
+function closeMazePage(){
+  mazePage.classList.remove('open');
+  cancelAnimationFrame(mazeRaf);
+  mazeRaf = null;
+  syncBodyScroll();
+}
+document.getElementById('mazeBack').addEventListener('click', closeMazePage);
+document.getElementById('mazeRestartBtn').addEventListener('click', mazeInit);
+mazeFinalBtn.addEventListener('click', () => { closeMazePage(); completeGame('maze'); });
+window.addEventListener('resize', () => { if (mazePage.classList.contains('open')) mazeLayout(); });
+
+// teclado
+const MAZE_KEYS = { ArrowUp:'up', ArrowDown:'down', ArrowLeft:'left', ArrowRight:'right', w:'up', s:'down', a:'left', d:'right', W:'up', S:'down', A:'left', D:'right' };
+document.addEventListener('keydown', (e) => {
+  if (topOverlay() !== mazePage) return;
+  if (e.key === 'Escape'){ closeMazePage(); return; }
+  const dir = MAZE_KEYS[e.key];
+  if (dir){
+    e.preventDefault();
+    if (mz) mz.auto = false;
+    mazeTryMove(dir);
+  }
+});
+
+// deslizar o dedo no labirinto
+let mazeTouch = null;
+mazeCanvas.addEventListener('touchstart', (e) => {
+  const t = e.touches[0];
+  mazeTouch = { x:t.clientX, y:t.clientY };
+}, { passive:true });
+mazeCanvas.addEventListener('touchmove', (e) => { e.preventDefault(); }, { passive:false });
+mazeCanvas.addEventListener('touchend', (e) => {
+  if (!mazeTouch) return;
+  const t = e.changedTouches[0];
+  const dx = t.clientX - mazeTouch.x, dy = t.clientY - mazeTouch.y;
+  mazeTouch = null;
+  if (Math.max(Math.abs(dx), Math.abs(dy)) < 22) return;
+  const dir = Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 'right' : 'left') : (dy > 0 ? 'down' : 'up');
+  if (!mz) return;
+  if (mz.moving){ mz.nextDir = dir; mz.auto = true; return; }
+  mz.auto = true;
+  mazeTryMove(dir);
+});
+
+// botões na tela (segurar = continua andando)
+document.querySelectorAll('#mazePad button').forEach(btn => {
+  let timer = null;
+  const start = (e) => {
+    e.preventDefault();
+    btn.classList.add('pressed');
+    if (mz) mz.auto = false;
+    mazeTryMove(btn.dataset.dir);
+    clearInterval(timer);
+    timer = setInterval(() => mazeTryMove(btn.dataset.dir), MOVE_MS + 15);
+  };
+  const stop = () => {
+    btn.classList.remove('pressed');
+    clearInterval(timer);
+    timer = null;
+  };
+  btn.addEventListener('pointerdown', start);
+  ['pointerup', 'pointerleave', 'pointercancel'].forEach(ev => btn.addEventListener(ev, stop));
+  btn.addEventListener('contextmenu', (e) => e.preventDefault());
 });
 
 loadConfig();

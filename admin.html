@@ -92,6 +92,63 @@
   .modal-btn:active{transform:scale(0.94);}
   .modal-btn.primary{background:linear-gradient(120deg, var(--gold), var(--rose)); color:var(--ink); border:none;}
   .modal-btn.ghost{background:none; border:1px solid rgba(255,255,255,0.18); color:var(--cream);}
+  select{
+    width:100%; background:rgba(0,0,0,0.25); border:1px solid rgba(255,255,255,0.12); border-radius:9px;
+    color:var(--cream); padding:10px 12px; font-family:'Space Grotesk', sans-serif; font-size:14px;
+  }
+  select option{background:var(--ink);}
+
+  /* ====================== Menu hambúrguer ====================== */
+  .topbar{display:flex; align-items:center; gap:14px; margin-bottom:4px;}
+  .topbar h1{margin:0;}
+  .menu-btn{
+    flex:0 0 auto; width:44px; height:44px; border-radius:12px; padding:0;
+    background:rgba(255,255,255,0.07); border:1px solid rgba(255,255,255,0.12);
+    display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px;
+  }
+  .menu-btn span{display:block; width:18px; height:2px; border-radius:2px; background:var(--cream); transition:transform 0.3s ease, opacity 0.2s ease;}
+  .menu-btn.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+  .menu-btn.open span:nth-child(2){opacity:0;}
+  .menu-btn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+  .menu-btn:active{transform:scale(0.92);}
+  .current-section{
+    display:flex; align-items:center; gap:8px; margin:0 0 16px;
+    font-family:'Fraunces', serif; font-weight:600; font-size:18px; color:var(--rose);
+  }
+  .current-section .cs-icon{font-size:18px;}
+
+  .drawer-backdrop{
+    position:fixed; inset:0; background:rgba(10,4,10,0.6); backdrop-filter:blur(2px); z-index:110;
+    opacity:0; visibility:hidden; transition:opacity 0.3s ease, visibility 0.3s;
+  }
+  .drawer-backdrop.open{opacity:1; visibility:visible;}
+  .drawer{
+    position:fixed; top:0; left:0; bottom:0; width:290px; max-width:84vw; z-index:120;
+    background:linear-gradient(180deg, #2a1626, #1c0f1f); border-right:1px solid rgba(217,169,92,0.22);
+    box-shadow:20px 0 60px rgba(0,0,0,0.5); padding:22px 14px 30px; overflow-y:auto;
+    transform:translateX(-105%); transition:transform 0.38s cubic-bezier(.22,.9,.24,1);
+  }
+  .drawer.open{transform:translateX(0);}
+  .drawer-head{display:flex; align-items:center; justify-content:space-between; padding:0 8px 10px;}
+  .drawer-head b{font-family:'Fraunces', serif; font-size:18px; color:var(--cream);}
+  .drawer-close{background:none; color:var(--cream); font-size:18px; opacity:0.6; padding:6px 8px;}
+  .nav-group{font-size:10px; letter-spacing:0.14em; text-transform:uppercase; opacity:0.45; margin:18px 12px 6px;}
+  .nav-item{
+    display:flex; align-items:center; gap:12px; width:100%; text-align:left;
+    background:none; color:var(--cream); border-radius:11px; padding:12px; font-size:14px; font-weight:500;
+    opacity:0; transform:translateX(-10px);
+  }
+  .drawer.open .nav-item{opacity:1; transform:none; transition:opacity 0.35s ease var(--d), transform 0.35s ease var(--d), background 0.2s ease;}
+  .nav-item .ni-icon{width:22px; text-align:center; font-size:16px;}
+  .nav-item:hover{background:rgba(255,255,255,0.05);}
+  .nav-item.active{background:linear-gradient(120deg, rgba(217,169,92,0.22), rgba(244,184,199,0.14)); color:var(--rose);}
+  .card[hidden]{display:none;}
+  .card.enter{animation:fadeSlideUp 0.45s ease both;}
+  .section-nav{display:flex; justify-content:space-between; gap:10px; margin:-4px 0 18px;}
+  .section-nav button{
+    padding:9px 16px; font-size:12.5px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color:var(--cream);
+  }
+  .section-nav button:disabled{opacity:0.3; cursor:default;}
 </style>
 </head>
 <body>
@@ -103,11 +160,23 @@
   <p class="status err" id="gateMsg"></p>
 </div>
 
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<nav class="drawer" id="drawer" aria-label="Seções do painel">
+  <div class="drawer-head">
+    <b>Seções</b>
+    <button type="button" class="drawer-close" id="drawerClose" aria-label="Fechar menu">✕</button>
+  </div>
+  <div id="drawerNav"></div>
+</nav>
+
 <div class="wrap">
-  <h1>Painel admin</h1>
+  <div class="topbar">
+    <button type="button" class="menu-btn" id="menuBtn" aria-label="Abrir menu"><span></span><span></span><span></span></button>
+    <h1>Painel admin</h1>
+  </div>
   <p class="sub">Edite o site — as mudanças ficam salvas no Firebase. <a class="view-link" href="index.html" target="_blank">Ver site ›</a> · <a class="view-link" href="#" id="logoutLink">Sair</a></p>
 
-  <div class="card">
+  <div class="card" data-section="geral">
     <h2>Informações gerais</h2>
     <label>Nome dele</label>
     <input type="text" id="partner1">
@@ -123,7 +192,7 @@
     <input type="text" id="footerSign">
   </div>
 
-  <div class="card">
+  <div class="card" data-section="carta">
     <h2>Carta surpresa</h2>
     <p class="field-hint" style="margin:0 0 12px;">Se preencher o texto, um botão "Abrir nossa carta" aparece no site, que abre essa mensagem em uma janela especial.</p>
     <label>Título da carta</label>
@@ -132,7 +201,7 @@
     <textarea id="loveLetter" style="min-height:120px;" placeholder="Escreva aqui a mensagem que vai aparecer no modal..."></textarea>
   </div>
 
-  <div class="card">
+  <div class="card" data-section="musica">
     <h2>Música</h2>
     <label>Título da música</label>
     <input type="text" id="songTitle">
@@ -146,31 +215,31 @@
     <div class="thumb-row"><span id="audioStatus" style="font-size:12px; opacity:0.6;">nenhum áudio enviado ainda</span></div>
   </div>
 
-  <div class="card">
+  <div class="card" data-section="player">
     <h2>Fotos do player</h2>
     <p class="field-hint" style="margin:0 0 12px;">Essas fotos alternam no quadrado da trilha sonora.</p>
     <div id="playerPhotosWrap"></div>
     <button type="button" id="addPlayerPhotoBtn" style="margin-top:6px; padding:10px 18px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:var(--cream); font-size:13px;">+ Adicionar foto</button>
   </div>
 
-  <div class="card">
+  <div class="card" data-section="galeria">
     <h2>Galeria de fotos</h2>
     <p class="field-hint" style="margin:0 0 12px;">Se adicionar fotos aqui, um botão "Ver galeria" aparece no final da carta surpresa, abrindo um álbum com título e mensagem para cada foto.</p>
     <div id="galleryWrap"></div>
     <button type="button" id="addGalleryBtn" style="margin-top:6px; padding:10px 18px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:var(--cream); font-size:13px;">+ Adicionar foto</button>
   </div>
 
-  <div class="card">
+  <div class="card" data-section="memoria">
     <h2>Jogo da memória</h2>
-    <p class="field-hint" style="margin:0 0 12px;">Depois de terminar o "Adivinhe a palavra", aparece um botão para abrir o jogo da memória com essas fotos. São sempre 6 pares (12 cartas) — se deixar alguma foto vazia, aparece um coração no lugar dela.</p>
+    <p class="field-hint" style="margin:0 0 12px;">Aparece no catálogo de jogos (botão "Play Game" no fim da galeria). São sempre 6 pares (12 cartas) — se deixar alguma foto vazia, aparece um coração no lugar dela.</p>
     <label>Mensagem ao completar o jogo</label>
     <textarea id="memoryWinMessage" style="min-height:80px;" placeholder="Mensagem que aparece quando todos os pares forem encontrados..."></textarea>
     <div id="memoryPhotosWrap"></div>
   </div>
 
-  <div class="card">
+  <div class="card" data-section="forca">
     <h2>Adivinhe a palavra — 1ª palavra</h2>
-    <p class="field-hint" style="margin:0 0 12px;">Aparece um botão "Play Game ❤️🎮" no final da galeria de fotos, abrindo o jogo "Adivinhe a palavra". Essa é a primeira palavra do jogo.</p>
+    <p class="field-hint" style="margin:0 0 12px;">Aparece no catálogo de jogos (botão "Play Game ❤️🎮" no fim da galeria). Essa é a primeira palavra do jogo.</p>
     <label>Dica</label>
     <input type="text" id="hangmanClue" placeholder="Ex: Eu amo o seu...">
     <label>Palavra secreta</label>
@@ -180,11 +249,31 @@
     <textarea id="hangmanWinMessage" style="min-height:90px;" placeholder="Mensagem que aparece quando a palavra é descoberta..."></textarea>
   </div>
 
-  <div class="card">
+  <div class="card" data-section="forca">
     <h2>Adivinhe a palavra — próximas palavras</h2>
     <p class="field-hint" style="margin:0 0 12px;">Depois da primeira palavra, o jogo segue automaticamente por essa lista, uma palavra de cada vez, com o botão "Próxima palavra🤭".</p>
     <div id="crosswordWrap"></div>
     <button type="button" id="addCrosswordBtn" style="margin-top:6px; padding:10px 18px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.15); color:var(--cream); font-size:13px;">+ Adicionar palavra</button>
+  </div>
+
+  <div class="card" data-section="labirinto">
+    <h2>Labirinto do amor</h2>
+    <p class="field-hint" style="margin:0 0 12px;">Ela controla uma bonequinha pelo labirinto até chegar na luz. Ao chegar, aparece essa mensagem. Cada vez que o jogo abre, um labirinto novo é gerado.</p>
+    <label>Tamanho do labirinto</label>
+    <select id="mazeSize">
+      <option value="small">Pequeno (fácil)</option>
+      <option value="medium">Médio</option>
+      <option value="large">Grande (difícil)</option>
+    </select>
+    <label>Título ao chegar na luz</label>
+    <input type="text" id="mazeWinTitle" placeholder="Ex: Você me encontrou! 💛">
+    <label>Mensagem romântica</label>
+    <textarea id="mazeWinMessage" style="min-height:110px;" placeholder="Mensagem que aparece quando ela chega na luz..."></textarea>
+  </div>
+
+  <div class="section-nav">
+    <button type="button" id="prevSectionBtn">‹ Anterior</button>
+    <button type="button" id="nextSectionBtn">Próxima ›</button>
   </div>
 
   <button class="save-btn" id="saveBtn">Salvar alterações</button>
@@ -242,6 +331,9 @@ const DEFAULT_CONFIG = {
   gallery: [],
   memoryPhotos: [],
   memoryWinMessage: "Cada foto dessas é um pedacinho da nossa história e eu quero guardar cada uma bem pertinho do coração! 🤍❤️",
+  mazeSize: "medium",
+  mazeWinTitle: "Você me encontrou! 💛",
+  mazeWinMessage: "Não importa quantos caminhos difíceis apareçam, todos eles me levam até você. Em cada labirinto da vida, eu vou estar te esperando na luz do fim. Te amo! ❤️✨",
   hangmanClue: "",
   hangmanWord: "Princesa",
   hangmanWinMessage: "Deus e Nossa Senhora mandou muito para mim uma princesa, uma que nem a Disney tem, te amo muito! 🥰❤️",
@@ -304,6 +396,85 @@ function confirmModal(title, msg, confirmLabel){
     openModal();
   });
 }
+
+// ---------- Menu hambúrguer / seções ----------
+const SECTIONS = [
+  { group:'Site',  id:'geral',     icon:'✦',  name:'Informações gerais' },
+  { group:'Site',  id:'carta',     icon:'💌', name:'Carta surpresa' },
+  { group:'Site',  id:'musica',    icon:'🎵', name:'Música' },
+  { group:'Fotos', id:'player',    icon:'🖼️', name:'Fotos do player' },
+  { group:'Fotos', id:'galeria',   icon:'📷', name:'Galeria de fotos' },
+  { group:'Jogos', id:'forca',     icon:'🔤', name:'Adivinhe a palavra' },
+  { group:'Jogos', id:'memoria',   icon:'🃏', name:'Jogo da memória' },
+  { group:'Jogos', id:'labirinto', icon:'🧭', name:'Labirinto do amor' }
+];
+const SECTION_KEY = 'joaoelayla_admin_section';
+const drawer = document.getElementById('drawer');
+const drawerBackdrop = document.getElementById('drawerBackdrop');
+const menuBtn = document.getElementById('menuBtn');
+let currentSectionId = 'geral';
+
+function buildDrawer(){
+  const nav = document.getElementById('drawerNav');
+  nav.innerHTML = '';
+  let lastGroup = null, n = 0;
+  SECTIONS.forEach(sec => {
+    if (sec.group !== lastGroup){
+      const g = document.createElement('div');
+      g.className = 'nav-group';
+      g.textContent = sec.group;
+      nav.appendChild(g);
+      lastGroup = sec.group;
+    }
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'nav-item';
+    btn.dataset.section = sec.id;
+    btn.style.setProperty('--d', (0.04 + n * 0.035) + 's');
+    btn.innerHTML = `<span class="ni-icon">${sec.icon}</span><span>${sec.name}</span>`;
+    btn.addEventListener('click', () => { showSection(sec.id); closeDrawer(); });
+    nav.appendChild(btn);
+    n++;
+  });
+}
+function openDrawer(){ drawer.classList.add('open'); drawerBackdrop.classList.add('open'); menuBtn.classList.add('open'); }
+function closeDrawer(){ drawer.classList.remove('open'); drawerBackdrop.classList.remove('open'); menuBtn.classList.remove('open'); }
+menuBtn.addEventListener('click', () => drawer.classList.contains('open') ? closeDrawer() : openDrawer());
+drawerBackdrop.addEventListener('click', closeDrawer);
+document.getElementById('drawerClose').addEventListener('click', closeDrawer);
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeDrawer(); });
+
+function showSection(id){
+  const idx = SECTIONS.findIndex(s => s.id === id);
+  if (idx < 0) id = 'geral';
+  currentSectionId = id;
+  const sec = SECTIONS.find(s => s.id === id);
+  document.querySelectorAll('.card[data-section]').forEach(card => {
+    const show = card.dataset.section === id;
+    card.hidden = !show;
+    card.classList.remove('enter');
+    if (show){ void card.offsetWidth; card.classList.add('enter'); }
+  });
+  document.querySelectorAll('.nav-item').forEach(b => b.classList.toggle('active', b.dataset.section === id));
+  const i = SECTIONS.indexOf(sec);
+  document.getElementById('prevSectionBtn').disabled = i === 0;
+  document.getElementById('nextSectionBtn').disabled = i === SECTIONS.length - 1;
+  try{ localStorage.setItem(SECTION_KEY, id); }catch(e){}
+  window.scrollTo({ top:0, behavior:'smooth' });
+}
+document.getElementById('prevSectionBtn').addEventListener('click', () => {
+  const i = SECTIONS.findIndex(s => s.id === currentSectionId);
+  if (i > 0) showSection(SECTIONS[i - 1].id);
+});
+document.getElementById('nextSectionBtn').addEventListener('click', () => {
+  const i = SECTIONS.findIndex(s => s.id === currentSectionId);
+  if (i < SECTIONS.length - 1) showSection(SECTIONS[i + 1].id);
+});
+
+buildDrawer();
+let savedSection = 'geral';
+try{ savedSection = localStorage.getItem(SECTION_KEY) || 'geral'; }catch(e){}
+showSection(savedSection);
 
 // ---------- Gate ----------
 document.getElementById('pinBtn').addEventListener('click', checkPin);
@@ -377,6 +548,9 @@ function fillForm(){
   });
 
   document.getElementById('memoryWinMessage').value = CONFIG.memoryWinMessage || DEFAULT_CONFIG.memoryWinMessage;
+  document.getElementById('mazeSize').value = CONFIG.mazeSize || DEFAULT_CONFIG.mazeSize;
+  document.getElementById('mazeWinTitle').value = CONFIG.mazeWinTitle || DEFAULT_CONFIG.mazeWinTitle;
+  document.getElementById('mazeWinMessage').value = CONFIG.mazeWinMessage || DEFAULT_CONFIG.mazeWinMessage;
 
   renderPlayerPhotos();
   renderGallery();
@@ -682,6 +856,9 @@ document.getElementById('saveBtn').addEventListener('click', async () => {
   CONFIG.playerPhotoUrls = (CONFIG.playerPhotoUrls || []).filter(Boolean);
   CONFIG.memoryWinMessage = document.getElementById('memoryWinMessage').value.trim() || DEFAULT_CONFIG.memoryWinMessage;
   CONFIG.memoryPhotos = (CONFIG.memoryPhotos || []).filter(Boolean);
+  CONFIG.mazeSize = document.getElementById('mazeSize').value || DEFAULT_CONFIG.mazeSize;
+  CONFIG.mazeWinTitle = document.getElementById('mazeWinTitle').value.trim() || DEFAULT_CONFIG.mazeWinTitle;
+  CONFIG.mazeWinMessage = document.getElementById('mazeWinMessage').value.trim() || DEFAULT_CONFIG.mazeWinMessage;
 
   const btn = document.getElementById('saveBtn');
   btn.disabled = true;
