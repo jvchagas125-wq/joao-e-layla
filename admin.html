@@ -231,7 +231,7 @@
 
   <div class="card" data-section="memoria">
     <h2>Jogo da memória</h2>
-    <p class="field-hint" style="margin:0 0 12px;">Aparece no catálogo de jogos (botão "Play Game" no fim da galeria). São sempre 6 pares (12 cartas) — se deixar alguma foto vazia, aparece um coração no lugar dela.</p>
+    <p class="field-hint" style="margin:0 0 12px;">Aparece no catálogo de jogos (botão "Play Game" no fim da galeria). São 12 pares (24 cartas) — se deixar alguma foto vazia, aparece um coração no lugar dela.</p>
     <label>Mensagem ao completar o jogo</label>
     <textarea id="memoryWinMessage" style="min-height:80px;" placeholder="Mensagem que aparece quando todos os pares forem encontrados..."></textarea>
     <div id="memoryPhotosWrap"></div>
@@ -701,7 +701,7 @@ document.getElementById('addGalleryBtn').addEventListener('click', () => {
   renderGallery();
 });
 
-const MEMORY_PAIRS = 6;
+const MEMORY_PAIRS = 12;
 
 function currentMemoryPhotos(){
   const arr = (CONFIG.memoryPhotos || []).slice(0, MEMORY_PAIRS);

@@ -469,10 +469,10 @@
 
   /* ====================== Jogo da memória ====================== */
   .memory-grid{
-    display:grid; grid-template-columns:repeat(3, 1fr); gap:10px;
-    width:100%; max-width:340px; margin:4px 0 8px;
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:8px;
+    width:100%; max-width:360px; margin:4px 0 8px;
   }
-  .memory-card{position:relative; aspect-ratio:3/4; cursor:pointer; perspective:800px;}
+  .memory-card{position:relative; aspect-ratio:1/1; cursor:pointer; perspective:800px;}
   .memory-card-inner{
     position:relative; width:100%; height:100%; transform-style:preserve-3d;
     transition:transform 0.5s cubic-bezier(.4,.2,.2,1);
@@ -484,7 +484,7 @@
   }
   .memory-card-back{
     background:linear-gradient(160deg, var(--wine), var(--night));
-    border:1px solid rgba(217,169,92,0.28); color:var(--gold); font-size:20px;
+    border:1px solid rgba(217,169,92,0.28); color:var(--gold); font-size:16px;
   }
   .memory-card-front{
     transform:rotateY(180deg); background:rgba(255,255,255,0.06);
@@ -1557,7 +1557,7 @@ const memoryCounter = document.getElementById('memoryCounter');
 const memoryStatusEl = document.getElementById('memoryStatus');
 const memoryStatusText = document.getElementById('memoryStatusText');
 const memoryFinalBtn = document.getElementById('memoryFinalBtn');
-const MEMORY_PAIRS = 6;
+const MEMORY_PAIRS = 12;
 // Combinações de fundo/símbolo bem distintas entre si, para o jogo continuar
 // jogável mesmo antes de fotos serem enviadas no admin.
 const MEMORY_PLACEHOLDERS = [
@@ -1566,7 +1566,13 @@ const MEMORY_PLACEHOLDERS = [
   { bg:'#f4b8c7', fg:'#5c2a4d', symbol:'✦' },
   { bg:'#1c0f22', fg:'#f4b8c7', symbol:'✦' },
   { bg:'#faf1e4', fg:'#5c2a4d', symbol:'♥' },
-  { bg:'#8a4a6d', fg:'#faf1e4', symbol:'✦' }
+  { bg:'#8a4a6d', fg:'#faf1e4', symbol:'✦' },
+  { bg:'#2f5d50', fg:'#faf1e4', symbol:'★' },
+  { bg:'#faf1e4', fg:'#d9a95c', symbol:'★' },
+  { bg:'#3b2a5c', fg:'#f4b8c7', symbol:'☾' },
+  { bg:'#d9a95c', fg:'#faf1e4', symbol:'☾' },
+  { bg:'#b8475f', fg:'#faf1e4', symbol:'♪' },
+  { bg:'#f4b8c7', fg:'#2a1420', symbol:'♪' }
 ];
 
 let memDeck = [];
