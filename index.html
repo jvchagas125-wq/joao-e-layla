@@ -116,7 +116,7 @@
   .envelope.open .envelope-seal{opacity:0; transform:translate(-50%,-50%) scale(0.3);}
   .envelope.open .envelope-letter{transform:translateY(-62%); box-shadow:0 18px 34px rgba(0,0,0,0.4);}
 
-  @media (prefers-reduced-motion: reduce){
+  @media (prefers-reduced-motion: reduce) and (max-width: 0px){
     .envelope{animation:none;}
   }
 
@@ -201,7 +201,7 @@
     font-size:14px; color:var(--ink); opacity:0.5; cursor:pointer; padding:4px;
   }
 
-  @media (prefers-reduced-motion: reduce){
+  @media (prefers-reduced-motion: reduce) and (max-width: 0px){
     main, #entry{transition:none;}
   }
 
@@ -921,7 +921,9 @@ function placeholderFallback(el, iconSize){
 
 /* ====================== Corações flutuantes ====================== */
 const heartsBg = document.getElementById('heartsBg');
-const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+// As animações fazem parte do presente, então ficam sempre ligadas
+// (mesmo se o Windows/celular estiver com "reduzir animações" ativado).
+const reduceMotion = false;
 
 function activeHeartsContainer(){
   const final = document.getElementById('finalPage');
